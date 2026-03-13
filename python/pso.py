@@ -52,7 +52,7 @@ class Simulacion:
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("PSO")
-        self.bg = pygame.transform.scale(pygame.image.load("2-10.png").convert(), (self.width, self.height + 100))
+        self.bg = pygame.transform.scale(pygame.image.load("assets/heatmap.png").convert(), (self.width, self.height + 100))
 
         self.particles = [
             Particle(random.randint(0, self.width), random.randint(0, self.height)) for _ in range(50)
