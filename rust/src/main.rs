@@ -138,8 +138,83 @@ impl Particle {
 	}
 }
 
+/// Draw a close button (X) in the top-right corner
+/// Returns true if the button was clicked
+fn draw_close_button(screen_width: f32) -> bool {
+	let button_size = 30.0;
+	let margin = 10.0;
+	let button_x = screen_width - button_size - margin;
+	let button_y = margin;
+
+	// Draw button background
+	draw_rectangle(button_x, button_y, button_size, button_size, DARKGRAY);
+
+	// Draw X symbol using two lines
+	let padding = 8.0;
+	let line_thickness = 3.0;
+
+	// Line from top-left to bottom-right
+	draw_line(
+		button_x + padding,
+		button_y + padding,
+		button_x + button_size - padding,
+		button_y + button_size - padding,
+		line_thickness,
+		RED
+	);
+
+	// Line from top-right to bottom-left
+	draw_line(
+		button_x + button_size - padding,
+		button_y + padding,
+		button_x + padding,
+		button_y + button_size - padding,
+		line_thickness,
+		RED
+	);
+
+	// Check if mouse is hovering over button (for visual feedback)
+	let (mouse_x, mouse_y) = mouse_position();
+	let is_hovering = mouse_x >= button_x 
+		&& mouse_x <= button_x + button_size 
+		&& mouse_y >= button_y 
+		&& mouse_y <= button_y + button_size;
+
+	// Draw hover effect
+	if is_hovering {
+		draw_rectangle_lines(button_x, button_y, button_size, button_size, 2.0, YELLOW);
+	}
+
+	// Check for click
+	is_hovering && is_mouse_button_pressed(MouseButton::Left)
+}
+
+/// Check if the user wants to quit
+/// Returns true if Q key pressed, Escape pressed, or close button clicked
+fn should_quit(screen_width: f32) -> bool {
+	// Check for Q key
+	if is_key_pressed(KeyCode::Q) {
+		println!("Quit requested via Q key");
+		return true;
+	}
+
+	// Check for Escape key (alternative)
+	if is_key_pressed(KeyCode::Escape) {
+		println!("Quit requested via Escape key");
+		return true;
+	}
+
+	// Check for close button click
+	if draw_close_button(screen_width) {
+		println!("Quit requested via close button");
+		return true;
+	}
+
+	false
+}
+
 // Macroquad entry point
-#[macroquad::main("PSO Rust")]
+#[macroquad::main("PSO Rust - Press Q or click X to close")]
 async fn main() {
 	// --- Setup ---
 
@@ -163,6 +238,15 @@ async fn main() {
 	loop {
 		clear_background(LIGHTGRAY);
 
+		// Get screen width for button positioning
+		let screen_width = screen_width();
+
+		// Check for quit condition at the start of each frame
+		if should_quit(screen_width) {
+			println!("Closing PSO application...");
+			std::process::exit(0);
+		}
+
 		// 1. Draw Map
 		draw_texture(&surface.texture, 0.0, 0.0, WHITE);
 
@@ -174,15 +258,15 @@ async fn main() {
 		// 3. Draw Best
 		draw_circle(gbest.0, gbest.1, D / 2.0, BLUE);
 
-		// Draw Text
+		// Draw Text with instructions
 		draw_text(
 			&format!(
-				"Best fitness: {:.2}\nEvals to best: {}\nEvals: {}", 
+				"Best fitness: {:.2}\nEvals to best: {}\nEvals: {}\n\nPress Q or ESC to quit\nOr click X button (top-right)", 
 				gbest.2, evals_to_best, evals
 			),
 			10.0, 
 			20.0, 
-			20.0, 
+			18.0, 
 			GREEN
 		);
 
