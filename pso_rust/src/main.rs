@@ -91,167 +91,167 @@ use drawing::{draw_global_best, draw_info_overlay, draw_scaled_texture, should_q
 /// the next screen refresh, giving control back to the OS.
 #[macroquad::main("PSO Rust - Press Q or click X to close")]
 async fn main() {
-    // ========================================================================
-    // SETUP PHASE
-    // ========================================================================
-    // Initialize all data before the main loop starts
-    // This runs once at program start
+	// ========================================================================
+	// SETUP PHASE
+	// ========================================================================
+	// Initialize all data before the main loop starts
+	// This runs once at program start
 
-    // -------------------------------------------------------------------------
-    // Load the terrain image
-    // -------------------------------------------------------------------------
-    // We use .await because loading a file is async (potentially slow I/O)
-    // The path is relative to where the executable runs
-    //
-    // # Error Handling Note
-    // In production, you'd handle the Result properly instead of expect
-    // For a demo, expect is fine (panics with helpful message on error)
-    println!("Loading terrain image...");
-    let surface = Surface::load("../assets/Moon_LRO_LOLA_global_LDEM_1024_b.png").await;
-    println!(
-        "Loaded image: {}x{} pixels",
-        surface.img_width, surface.img_height
-    );
+	// -------------------------------------------------------------------------
+	// Load the terrain image
+	// -------------------------------------------------------------------------
+	// We use .await because loading a file is async (potentially slow I/O)
+	// The path is relative to where the executable runs
+	//
+	// # Error Handling Note
+	// In production, you'd handle the Result properly instead of expect
+	// For a demo, expect is fine (panics with helpful message on error)
+	println!("Loading terrain image...");
+	let surface = Surface::load("../assets/Moon_LRO_LOLA_global_LDEM_1024_b.png").await;
+	println!(
+		"Loaded image: {}x{} pixels",
+		surface.img_width, surface.img_height
+	);
 
-    // -------------------------------------------------------------------------
-    // Store image dimensions (these are fixed, don't change)
-    // -------------------------------------------------------------------------
-    // We extract these for convenience - cleaner than surface.img_width each time
-    let img_width = surface.img_width;
-    let img_height = surface.img_height;
+	// -------------------------------------------------------------------------
+	// Store image dimensions (these are fixed, don't change)
+	// -------------------------------------------------------------------------
+	// We extract these for convenience - cleaner than surface.img_width each time
+	let img_width = surface.img_width;
+	let img_height = surface.img_height;
 
-    // -------------------------------------------------------------------------
-    // Create the particle swarm
-    // -------------------------------------------------------------------------
-    // Vectors are Rust's growable arrays (like ArrayList in Java, list in Python)
-    // The ::<T> syntax specifies the type (type annotation)
-    // We could write Vec::new() and let Rust infer the type
-    
-    // Create PUNTOS (100) particles using iterator and collect
-    // (0..PUNTOS) creates a Range (iterator producing 0, 1, 2, ..., 99)
-    // .map(|_| Particle::new(...)) transforms each number into a Particle
-    // |_| is a closure (anonymous function), _ means we ignore the parameter
-    // .collect() gathers all items into a collection (Vec here)
-    let mut particles: Vec<Particle> = (0..particle::PUNTOS)
-        .map(|_| Particle::new(img_width, img_height))
-        .collect();
+	// -------------------------------------------------------------------------
+	// Create the particle swarm
+	// -------------------------------------------------------------------------
+	// Vectors are Rust's growable arrays (like ArrayList in Java, list in Python)
+	// The ::<T> syntax specifies the type (type annotation)
+	// We could write Vec::new() and let Rust infer the type
 
-    println!("Created {} particles", particles.len());
+	// Create PUNTOS (100) particles using iterator and collect
+	// (0..PUNTOS) creates a Range (iterator producing 0, 1, 2, ..., 99)
+	// .map(|_| Particle::new(...)) transforms each number into a Particle
+	// |_| is a closure (anonymous function), _ means we ignore the parameter
+	// .collect() gathers all items into a collection (Vec here)
+	let mut particles: Vec<Particle> = (0..particle::PUNTOS)
+		.map(|_| Particle::new(img_width, img_height))
+		.collect();
 
-    // -------------------------------------------------------------------------
-    // Initialize global best tracking
-    // -------------------------------------------------------------------------
-    // Global best is a tuple: (x, y, fitness)
-    // We start with fitness = -1.0 (worse than any valid fitness 0-255)
-    let mut gbest: (f32, f32, f32) = (0.0, 0.0, -1.0);
+	println!("Created {} particles", particles.len());
 
-    // Counters for statistics
-    let mut evals = 0; // Total fitness evaluations
-    let mut evals_to_best = 0; // Evaluations when best was found
+	// -------------------------------------------------------------------------
+	// Initialize global best tracking
+	// -------------------------------------------------------------------------
+	// Global best is a tuple: (x, y, fitness)
+	// We start with fitness = -1.0 (worse than any valid fitness 0-255)
+	let mut gbest: (f32, f32, f32) = (0.0, 0.0, -1.0);
 
-    // ========================================================================
-    // MAIN LOOP
-    // ========================================================================
-    // This is the "game loop" - runs continuously until quit
-    // Each iteration is one frame (typically 60 frames per second)
+	// Counters for statistics
+	let mut evals = 0; // Total fitness evaluations
+	let mut evals_to_best = 0; // Evaluations when best was found
 
-    loop {
-        // ---------------------------------------------------------------------
-        // FRAME SETUP
-        // ---------------------------------------------------------------------
+	// ========================================================================
+	// MAIN LOOP
+	// ========================================================================
+	// This is the "game loop" - runs continuously until quit
+	// Each iteration is one frame (typically 60 frames per second)
 
-        // Clear the screen to black
-        // This erases the previous frame's content
-        // If we don't clear, previous frames would show through
-        clear_background(BLACK);
+	loop {
+		// ---------------------------------------------------------------------
+		// FRAME SETUP
+		// ---------------------------------------------------------------------
 
-        // Get current screen dimensions
-        // These might change if user resizes the window
-        let screen_w = screen_width();
-        let screen_h = screen_height();
+		// Clear the screen to black
+		// This erases the previous frame's content
+		// If we don't clear, previous frames would show through
+		clear_background(BLACK);
 
-        // Calculate scale factors for coordinate conversion
-        // scale_x = screen_width / image_width
-        // This lets us convert image coords to screen coords
-        let scale_x = screen_w / img_width;
-        let scale_y = screen_h / img_height;
+		// Get current screen dimensions
+		// These might change if user resizes the window
+		let screen_w = screen_width();
+		let screen_h = screen_height();
 
-        // ---------------------------------------------------------------------
-        // QUIT CHECK
-        // ---------------------------------------------------------------------
-        // Check if user wants to quit (Q key, Escape, or X button)
-        // should_quit also draws the close button
-        if should_quit(screen_w) {
-            println!("Closing PSO application...");
-            // Exit the program with success code (0)
-            // std::process::exit terminates immediately
-            std::process::exit(0);
-        }
+		// Calculate scale factors for coordinate conversion
+		// scale_x = screen_width / image_width
+		// This lets us convert image coords to screen coords
+		let scale_x = screen_w / img_width;
+		let scale_y = screen_h / img_height;
 
-        // ---------------------------------------------------------------------
-        // RENDERING PHASE
-        // ---------------------------------------------------------------------
-        // Draw everything in back-to-front order (painter's algorithm)
+		// ---------------------------------------------------------------------
+		// QUIT CHECK
+		// ---------------------------------------------------------------------
+		// Check if user wants to quit (Q key, Escape, or X button)
+		// should_quit also draws the close button
+		if should_quit(screen_w) {
+			println!("Closing PSO application...");
+			// Exit the program with success code (0)
+			// std::process::exit terminates immediately
+			std::process::exit(0);
+		}
 
-        // 1. Draw the terrain map (background layer)
-        draw_scaled_texture(&surface.texture, screen_w, screen_h);
+		// ---------------------------------------------------------------------
+		// RENDERING PHASE
+		// ---------------------------------------------------------------------
+		// Draw everything in back-to-front order (painter's algorithm)
 
-        // 2. Draw all particles (middle layer)
-        // Iterate through particles and draw each one
-        // The & borrows each particle immutably (read-only)
-        for p in &particles {
-            p.display(&surface, scale_x, scale_y);
-        }
+		// 1. Draw the terrain map (background layer)
+		draw_scaled_texture(&surface.texture, screen_w, screen_h);
 
-        // 3. Draw the global best marker (highlight layer)
-        draw_global_best(gbest, scale_x, scale_y);
+		// 2. Draw all particles (middle layer)
+		// Iterate through particles and draw each one
+		// The & borrows each particle immutably (read-only)
+		for p in &particles {
+			p.display(&surface, scale_x, scale_y);
+		}
 
-        // 4. Draw the info overlay (top layer - always visible)
-        draw_info_overlay(
-            gbest,
-            evals_to_best,
-            evals,
-            screen_w,
-            screen_h,
-            img_width,
-            img_height,
-        );
+		// 3. Draw the global best marker (highlight layer)
+		draw_global_best(gbest, scale_x, scale_y);
 
-        // ---------------------------------------------------------------------
-        // UPDATE PHASE
-        // ---------------------------------------------------------------------
-        // Update particle positions and evaluate fitness
+		// 4. Draw the info overlay (top layer - always visible)
+		draw_info_overlay(
+			gbest,
+			evals_to_best,
+			evals,
+			screen_w,
+			screen_h,
+			img_width,
+			img_height,
+		);
 
-        // Iterate mutably through particles to update them
-        // &mut gives us mutable references (can modify)
-        for p in &mut particles {
-            // Move the particle according to PSO rules
-            // We pass the global best position to guide movement
-            p.r#move(gbest.0, gbest.1, img_width, img_height);
+		// ---------------------------------------------------------------------
+		// UPDATE PHASE
+		// ---------------------------------------------------------------------
+		// Update particle positions and evaluate fitness
 
-            // Evaluate fitness and potentially update global best
-            // We pass mutable references so eval can update them
-            p.eval(
-                &surface,
-                &mut gbest,
-                &mut evals,
-                &mut evals_to_best,
-            );
-        }
+		// Iterate mutably through particles to update them
+		// &mut gives us mutable references (can modify)
+		for p in &mut particles {
+			// Move the particle according to PSO rules
+			// We pass the global best position to guide movement
+			p.r#move(gbest.0, gbest.1, img_width, img_height);
 
-        // ---------------------------------------------------------------------
-        // FRAME END
-        // ---------------------------------------------------------------------
-        // Wait for the next frame
-        // This is CRUCIAL - without it:
-        // - The loop would run as fast as possible (100% CPU)
-        // - The OS would think the program is frozen
-        // - Events (input, window resize) wouldn't be processed
-        //
-        // .await yields control back to the async runtime
-        // When the next frame is ready, execution resumes here
-        next_frame().await;
-    }
+			// Evaluate fitness and potentially update global best
+			// We pass mutable references so eval can update them
+			p.eval(
+				&surface,
+				&mut gbest,
+				&mut evals,
+				&mut evals_to_best,
+			);
+		}
+
+		// ---------------------------------------------------------------------
+		// FRAME END
+		// ---------------------------------------------------------------------
+		// Wait for the next frame
+		// This is CRUCIAL - without it:
+		// - The loop would run as fast as possible (100% CPU)
+		// - The OS would think the program is frozen
+		// - Events (input, window resize) wouldn't be processed
+		//
+		// .await yields control back to the async runtime
+		// When the next frame is ready, execution resumes here
+		next_frame().await;
+	}
 }
 
 // ============================================================================
