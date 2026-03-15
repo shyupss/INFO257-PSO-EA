@@ -1,5 +1,5 @@
 [package]
-name = "rust"
+name = "pso_rust"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,3 +7,6 @@ edition = "2024"
 image = "0.25.10"
 macroquad = "0.4.14"
 rand = "0.10.0"
+
+[profile.release]
+opt-level = 3
