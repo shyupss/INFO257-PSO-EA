@@ -144,7 +144,7 @@ async fn main() {
 	// --- Setup ---
 
 	// We need the image file in the execution directory
-	let surface = Surface::load("Moon_LRO_LOLA_global_LDEM_1024_b.png").await;
+	let surface = Surface::load("../assets/Moon_LRO_LOLA_global_LDEM_1024_b.png").await;
 
 	// Notice we dropped the () here because they are properties now
 	let width = surface.img.width as f32;
