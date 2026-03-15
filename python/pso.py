@@ -18,7 +18,7 @@ class Simulacion:
         # Parámetros de las partículas
         self.learning_c1 = 1.4
         self.learning_c2 = 10
-        self.inercia = 0.7
+        self.inercia = 10
         self.max_velocity = 4
 
         self.gbest = (0, 0)
