@@ -6,7 +6,6 @@ from Particle import Particle
 VELOCITY = 3
 W = 200
 
-
 class Simulacion:
     def __init__(self):
         pygame.init()
