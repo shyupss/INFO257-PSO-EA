@@ -7,9 +7,11 @@ class Particle:
         self.color = color
         self.radius = radius
 
+        self.image = pygame.image.load("assets/particle.png").convert_alpha()
+
         # Posición
-        self.x = random.uniform(0, radius * 2)
-        self.y = random.uniform(0, radius * 2)
+        self.x = random.uniform(0, 1000)
+        self.y = random.uniform(0, 700)
 
         # Velocidad
         self.vx = random.uniform(-1, 1)
@@ -24,13 +26,14 @@ class Particle:
 
 
     def draw(self, screen):
-        pygame.draw.circle(
-            screen,
-            self.color,
-            (int(self.x), int(self.y)),
-            self.radius,
-            width = 2
-        )
+        screen.blit(self.image, dest = (int(self.x), int(self.y)))
+        # pygame.draw.circle(
+        #     screen,
+        #     self.color,
+        #     (int(self.x), int(self.y)),
+        #     self.radius,
+        #     width = 2
+        # )
 
 
     def evaluate(self, heatmap: pygame.Surface):
@@ -38,7 +41,7 @@ class Particle:
         r, g, b, _ = heatmap.get_at((int(self.x), int(self.y)))
 
         # b - r -> Buscar las zonas más azules
-        fitness = b - r
+        fitness = b - r - g
 
         if fitness > self.pbest:
             self.pbest = fitness
@@ -55,11 +58,11 @@ class Particle:
         # c2 = Factor de aprendizaje según el éxito global 
         # max_vel = Velocidad máxima que puede tomar la partícula
 
-        px = py = random.random()
+        px, py = random.random(), random.random()
 
         # Actualizar la velocidad
         self.vx = w * self.vx + c1 * px * (self.px - self.x) + c2 * px * (gbest[0] - self.x)
-        self.vy = w * self.vy + c1 * py * (self.py - self.y) + c2 * py * (gbest[0] - self.y)
+        self.vy = w * self.vy + c1 * py * (self.py - self.y) + c2 * py * (gbest[1] - self.y)
         
         # Regular la velocidad de la partícula
         speed = math.sqrt(self.vx ** 2 + self.vy ** 2)
@@ -72,5 +75,6 @@ class Particle:
         self.y += self.vy
 
         # Manejo de bordes
-        self.x = max(0, min(screen.width - 1, self.x))
-        self.y = max(0, min(screen.height - 1, self.y))
+        width, height = screen.get_size()
+        self.x = max(0, min(width - 1, self.x))
+        self.y = max(0, min(height - 1, self.y))

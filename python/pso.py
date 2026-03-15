@@ -1,9 +1,7 @@
 import pygame
-import random
 
 from Particle import Particle
-
-VELOCITY = 3
+from InformationTab import InformationTab
 
 class Simulacion:
     def __init__(self):
@@ -15,10 +13,19 @@ class Simulacion:
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("PSO")
         self.bg = pygame.transform.scale(pygame.image.load("assets/heatmap.png").convert(), (self.width, self.height + 100))
+        self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
+
+        # Parámetros de las partículas
+        self.learning_c1 = 1.4
+        self.learning_c2 = 1.4
+        self.inercia = 0.7
+        self.max_velocity = 4
 
         self.particles = [
             Particle() for _ in range(50)
         ]
+
+        self.information = InformationTab()
 
         self.gbest = (0, 0)
         self.gbest_fitness = -999999
@@ -57,15 +64,37 @@ class Simulacion:
 
         # Mover las partículas
         for particle in self.particles:
-            particle.move(self.screen, self.gbest)
+            particle.move(self.screen, self.gbest,
+                c1 = self.learning_c1,
+                c2 = self.learning_c2,
+                w = self.inercia,
+                max_vel = self.max_velocity
+            )
 
 
     # Renderizar assets y objetos
     def render(self):
         self.screen.blit(self.bg, (0, 0))  # imagen de fondo
 
+        # Dibujar partículas
         for particle in self.particles:
             particle.draw(self.screen)
+
+        # Dibujar el global best
+        self.screen.blit(self.gbest_img, dest = (int(self.gbest[0]), int(self.gbest[1])))
+
+        # Dibujar información
+        self.information.render(self.screen, 
+            {
+                "Cantidad de partículas": len(self.particles),
+                "Mejor posición global": f"({self.gbest[0]}, {self.gbest[1]})",
+                "Fitness global": self.gbest_fitness,
+                "Learning factor C1": self.learning_c1,
+                "Learning factor C2": self.learning_c2,
+                "Inercia W": self.inercia,
+                "Velocidad máxima": self.max_velocity
+            }
+        )
 
         pygame.display.flip()
 
