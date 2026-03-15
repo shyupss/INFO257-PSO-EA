@@ -21,14 +21,16 @@ class Simulacion:
         self.inercia = 0.7
         self.max_velocity = 4
 
+        self.gbest = (0, 0)
+        self.gbest_fitness = -999999
+
+        # Generación de partículas
         self.particles = [
             Particle() for _ in range(50)
         ]
 
+        # Panel de información
         self.information = InformationTab()
-
-        self.gbest = (0, 0)
-        self.gbest_fitness = -999999
 
         self.clock = pygame.time.Clock()
         self.running = True
