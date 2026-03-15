@@ -12,12 +12,12 @@ class Simulacion:
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("PSO")
-        self.bg = pygame.transform.scale(pygame.image.load("assets/heatmap.png").convert(), (self.width, self.height + 100))
+        self.bg = pygame.image.load("assets/circulos.png").convert()
         self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         # Parámetros de las partículas
         self.learning_c1 = 1.4
-        self.learning_c2 = 1.4
+        self.learning_c2 = 10
         self.inercia = 0.7
         self.max_velocity = 4
 
@@ -89,7 +89,7 @@ class Simulacion:
         self.information.render(self.screen, 
             {
                 "Cantidad de partículas": len(self.particles),
-                "Mejor posición global": f"({self.gbest[0]}, {self.gbest[1]})",
+                "Mejor posición global": f"({self.gbest[0]:0.2f}, {self.gbest[1]:0.2f})",
                 "Fitness global": self.gbest_fitness,
                 "Learning factor C1": self.learning_c1,
                 "Learning factor C2": self.learning_c2,

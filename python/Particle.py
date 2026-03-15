@@ -36,9 +36,9 @@ class Particle:
         # )
 
 
-    def evaluate(self, heatmap: pygame.Surface):
+    def evaluate(self, background: pygame.Surface):
         # Obtener los colores de la imagen (mapa de calor)
-        r, g, b, _ = heatmap.get_at((int(self.x), int(self.y)))
+        r, g, b, _ = background.get_at((int(self.x), int(self.y)))
 
         # b - r -> Buscar las zonas más azules
         fitness = b - r - g
