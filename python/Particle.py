@@ -1,17 +1,21 @@
 import pygame
 import random
 import math
+from Rastrigin import Rastrigin
 
 class Particle:
-    def __init__(self, radius = 8, color = (170, 0, 255)):
+    def __init__(self, screen: pygame.Surface, radius = 8, color = (170, 0, 255)):
         self.color = color
         self.radius = radius
 
         self.image = pygame.image.load("assets/particle.png").convert_alpha()
+        w, h = screen.get_size()
+        self.width = w
+        self.height = h
 
         # Posición
-        self.x = random.uniform(0, 1000)
-        self.y = random.uniform(0, 700)
+        self.x = random.uniform(0, w)
+        self.y = random.uniform(0, h)
 
         # Velocidad
         self.vx = random.uniform(-1, 1)
@@ -25,6 +29,12 @@ class Particle:
         self.pbest = -999999
 
 
+    def translate_coords_to_dom(self):
+        return (
+            -3 + (self.x / self.width) * 10,
+            -3 + (self.y / self.height) * 10
+        )
+
     def draw(self, screen):
         screen.blit(self.image, dest = (int(self.x), int(self.y)))
         # pygame.draw.circle(
@@ -36,12 +46,9 @@ class Particle:
         # )
 
 
-    def evaluate(self, background: pygame.Surface):
-        # Obtener los colores de la imagen (mapa de calor)
-        r, g, b, _ = background.get_at((int(self.x), int(self.y)))
-
-        # b - r -> Buscar las zonas más azules
-        fitness = b - r - g
+    def evaluate(self):
+        x, y = self.translate_coords_to_dom()
+        fitness = -Rastrigin.evaluate(x, y)
 
         if fitness > self.pbest:
             self.pbest = fitness

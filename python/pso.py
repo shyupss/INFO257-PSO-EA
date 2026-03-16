@@ -2,21 +2,24 @@ import pygame
 
 from Particle import Particle
 from InformationTab import InformationTab
+from Rastrigin import Rastrigin
 
 class Simulacion:
     def __init__(self):
         pygame.init()
 
-        self.width = 1000
+        self.width = 700
         self.height = 700
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("PSO")
-        self.bg = pygame.image.load("assets/circulos.png").convert()
+        #self.bg = pygame.image.load("assets/circulos.png").convert()
+        rastrigin_map = Rastrigin(self.width, self.height)
+        self.bg = rastrigin_map.generate()
         self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         # Parámetros de las partículas
-        self.learning_c1 = 1.4
+        self.learning_c1 = 1.5
         self.learning_c2 = 10
         self.inercia = 10
         self.max_velocity = 4
@@ -26,7 +29,7 @@ class Simulacion:
 
         # Generación de partículas
         self.particles = [
-            Particle() for _ in range(50)
+            Particle(self.screen) for _ in range(50)
         ]
 
         # Panel de información
@@ -58,7 +61,7 @@ class Simulacion:
 
         # Evaluar el fitness
         for particle in self.particles:
-            fitness = particle.evaluate(self.bg)
+            fitness = particle.evaluate()
 
             if fitness > self.gbest_fitness:
                 self.gbest_fitness = fitness
