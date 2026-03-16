@@ -1,184 +1,111 @@
-//! Surface module - handles image loading and fitness evaluation
+//! Surface module - generates a Rastrigin function heatmap texture
 //!
-//! This module encapsulates all functionality related to the terrain/map image.
-//! In Rust, modules are used to organize code into logical units.
-//!
-//! Key concepts covered:
-//! - Structs (custom data types)
-//! - Implementation blocks (impl)
-//! - Ownership and borrowing
-//! - async/await for asynchronous operations
-//! - Option and Result types for error handling
+//! Replaces the old image-loading approach with a procedurally generated
+//! heatmap of the Rastrigin function over the search domain.
 
-// Import everything from macroquad's prelude
-// The 'prelude' is a convention for commonly used items that are re-exported
-// The :: syntax accesses nested modules/items (like folder paths)
 use macroquad::prelude::*;
+use crate::particle::{rastrigin, DOMAIN_MIN, DOMAIN_MAX};
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-// Constants are compile-time immutable values (cannot be changed at runtime)
-// - 'const' keyword declares a constant
-// - Must have explicit type annotation (no type inference)
-// - Named in SCREAMING_SNAKE_CASE by convention
-// - Inlined by the compiler wherever used (no memory address at runtime)
+/// Resolution (pixels) for the heatmap texture
+const HEATMAP_RESOLUTION: u16 = 512;
 
-/// The Surface struct holds both the image data and the GPU texture.
-///
-/// # Rust Structs
-/// Structs are custom data types that group related data together.
-/// Think of them as "objects" that only hold data (no methods here).
-///
-/// # Visibility (pub)
-/// - 'pub' makes items public (accessible from other modules)
-/// - Without 'pub', items are private by default (only visible in this module)
-/// - We make the struct public so other modules can use it
-pub struct Surface {
-	/// The image data stored in CPU memory.
-	/// 
-	/// # Ownership
-	/// In Rust, 'img' owns the Image data. When Surface is dropped (goes out of scope),
-	/// the Image is automatically freed. No garbage collector needed!
-	/// 
-	/// # Why not a reference (&Image)?
-	/// References borrow data temporarily. Since Surface needs to own the image
-	/// for the entire program lifetime, we use owned data, not references.
-	pub img: Image,
-
-	/// The GPU texture for rendering.
-	/// 
-	/// # Texture2D vs Image
-	/// - Image: Raw pixel data in CPU memory (can read/write pixels)
-	/// - Texture2D: GPU-optimized format for drawing (fast rendering)
-	/// We need both: Image for pixel access, Texture for drawing.
+/// Holds the precomputed Rastrigin heatmap texture and coordinate mapping info.
+pub struct RastriginSurface {
+	/// GPU texture of the heatmap
 	pub texture: Texture2D,
-
-	/// Original image width in pixels.
-	/// 
-	/// # Type Choice: f32 vs u32
-	/// Image dimensions are naturally integers (u32), but we store as f32 because:
-	/// 1. We do lots of floating-point math with these values
-	/// 2. Avoids constant casting (as f32) throughout the code
-	/// 3. Slightly more convenient for our use case
-	pub img_width: f32,
-
-	/// Original image height in pixels
-	pub img_height: f32,
+	/// Domain bounds for coordinate conversions
+	pub domain_min: f64,
+	pub domain_max: f64,
 }
 
-// ============================================================================
-// IMPLEMENTATION BLOCK
-// ============================================================================
-// 'impl' blocks add functionality to structs
-// This is where methods and associated functions are defined
-// Think of impl as "methods for this struct"
+impl RastriginSurface {
+	/// Generate the heatmap texture from the Rastrigin function.
+	pub fn new() -> Self {
+		let resolution = HEATMAP_RESOLUTION;
+		let mut image = Image::gen_image_color(resolution, resolution, BLACK);
 
-impl Surface {
-	/// Load an image file and create a Surface.
-	///
-	/// # Associated Function vs Method
-	/// - Associated function: Called on the type (Surface::load(...))
-	/// - Method: Called on an instance (surface.get_fitness(...))
-	/// - 'Self' in the return type refers to the struct type (Surface)
-	///
-	/// # async fn
-	/// - Async functions return a Future (a promise of a value)
-	/// - The '.await' keyword pauses until the Future completes
-	/// - Required because loading files is I/O (potentially slow)
-	///
-	/// # Error Handling: Result and expect
-	/// - load_image() returns Result<Image, Error>
-	/// - Result is an enum: Ok(value) or Err(error)
-	/// - .expect("msg") unwraps Ok or panics with message on Err
-	/// - For production code, prefer proper error handling with ? operator
-	pub async fn load(path: &str) -> Self {
-		// load_image is an async function from macroquad
-		// The .await pauses this function until loading completes
-		// During await, other code can run (non-blocking)
-		let img = load_image(path)
-			.await  // Wait for async operation to complete
-			.expect("Cannot open image file"); // Panic with message if loading fails
-
-		// Store original dimensions
-		// 'as f32' is a type cast (converts u16 to f32)
-		// Rust requires explicit casts for potentially lossy conversions
-		let img_width = img.width as f32;
-		let img_height = img.height as f32;
-
-		// Create a GPU texture from the image
-		// The & symbol creates a reference (borrow)
-		// We borrow img because Texture2D::from_image doesn't need ownership
-		let texture = Texture2D::from_image(&img);
-
-		// Return a new Surface instance
-		// This is a struct initialization using field init shorthand
-		// When variable name matches field name, just write the name once
-		// Equivalent to: Surface { img: img, texture: texture, ... }
-		Self {
-			img,
-			texture,
-			img_width,
-			img_height,
+		// Find the max value in the domain for color normalization
+		let mut max_value: f64 = 0.0;
+		for pixel_y in 0..resolution {
+			for pixel_x in 0..resolution {
+				let domain_x = Self::pixel_to_domain(pixel_x, resolution);
+				let domain_y = Self::pixel_to_domain(pixel_y, resolution);
+				let value = rastrigin([domain_x, domain_y]);
+				if value > max_value {
+					max_value = value;
+				}
 			}
+		}
+
+		// Generate the heatmap pixels
+		for pixel_y in 0..resolution {
+			for pixel_x in 0..resolution {
+				let domain_x = Self::pixel_to_domain(pixel_x, resolution);
+				let domain_y = Self::pixel_to_domain(pixel_y, resolution);
+				let value = rastrigin([domain_x, domain_y]);
+				let normalized = (value / max_value) as f32;
+				let color = Self::value_to_color(normalized);
+				image.set_pixel(pixel_x as u32, pixel_y as u32, color);
+			}
+		}
+
+		let texture = Texture2D::from_image(&image);
+		texture.set_filter(FilterMode::Linear);
+
+		RastriginSurface {
+			texture,
+			domain_min: DOMAIN_MIN,
+			domain_max: DOMAIN_MAX,
+		}
 	}
 
-	/// Get the "fitness" value at a pixel position.
-	/// 
-	/// In PSO terms, "fitness" is how good a position is (brighter = higher).
-	/// We use the red channel as the fitness value.
-	///
-	/// # Parameters
-	/// - &self: Borrows the Surface immutably (read-only access)
-	///   This is a method because it takes 'self'
-	/// - x, y: Position in image coordinates (floating point for smooth movement)
-	///
-	/// # Return Type
-	/// Returns f32 (the fitness value scaled 0-255)
-	///
-	/// # The Borrowing Rules
-	/// - &self: Immutable borrow (can have multiple readers)
-	/// - &mut self: Mutable borrow (exclusive access, can modify)
-	/// - You cannot have both at the same time (prevents data races!)
-	pub fn get_fitness(&self, x: f32, y: f32) -> f32 {
-		// Clamp coordinates to valid range
-		// clamp(min, max) ensures value stays within bounds
-		// - Prevents array out-of-bounds errors
-		// - If particle goes outside image, we use edge pixel
-		let ix = x.clamp(0.0, self.img_width - 1.0) as u32;
-		let iy = y.clamp(0.0, self.img_height - 1.0) as u32;
-
-		// Get pixel color at (ix, iy)
-		// Macroquad's get_pixel returns a Color struct
-		// Color has r, g, b, a fields (each 0.0 to 1.0, normalized floats)
-		let pixel = self.img.get_pixel(ix, iy);
-
-		// Return red channel scaled to 0-255 range
-		// This matches the original Processing sketch behavior
-		// Processing used 0-255 for colors; we scale back for compatibility
-		pixel.r * 255.0
+	/// Convert a pixel coordinate to the domain value.
+	fn pixel_to_domain(pixel: u16, resolution: u16) -> f64 {
+		let ratio = pixel as f64 / (resolution - 1) as f64;
+		DOMAIN_MIN + ratio * (DOMAIN_MAX - DOMAIN_MIN)
 	}
-}
 
-// ============================================================================
-// UNIT TESTS
-// ============================================================================
-// Rust has built-in testing support
-// Tests are marked with #[test] attribute
-// Run with: cargo test
-// Tests are compiled conditionally and not included in release builds
+	/// Convert domain coordinates to screen (pixel) coordinates.
+	pub fn domain_to_screen(&self, domain_x: f64, domain_y: f64, screen_width: f32, screen_height: f32) -> (f32, f32) {
+		let normalized_x = (domain_x - self.domain_min) / (self.domain_max - self.domain_min);
+		let normalized_y = (domain_y - self.domain_min) / (self.domain_max - self.domain_min);
+		let screen_x = normalized_x as f32 * screen_width;
+		let screen_y = normalized_y as f32 * screen_height;
+		(screen_x, screen_y)
+	}
 
-#[cfg(test)] // This module only exists during testing
-mod tests {
-	// Import everything from parent module
-	use super::*;
+	/// Map a normalized value [0..1] to a color on a blue→cyan→green→yellow→red gradient.
+	fn value_to_color(normalized_value: f32) -> Color {
+		// Apply sqrt to spread more color range across lower values (where the action is)
+		let mapped_value = normalized_value.sqrt();
 
-	#[test]
-	fn test_clamp_behavior() {
-		// This test demonstrates clamp behavior
-		// In real tests, you'd test actual Surface methods
-		assert_eq!(5.0_f32.clamp(0.0, 10.0), 5.0);  // In range
-		assert_eq!((-5.0_f32).clamp(0.0, 10.0), 0.0); // Below min
-		assert_eq!(15.0_f32.clamp(0.0, 10.0), 10.0); // Above max
+		let (red, green, blue) = if mapped_value < 0.25 {
+			// Dark blue → Cyan
+			let interpolation = mapped_value / 0.25;
+			(0.0, interpolation, 0.6 + 0.4 * interpolation)
+		} else if mapped_value < 0.5 {
+			// Cyan → Green
+			let interpolation = (mapped_value - 0.25) / 0.25;
+			(0.0, 1.0, 1.0 - interpolation)
+		} else if mapped_value < 0.75 {
+			// Green → Yellow
+			let interpolation = (mapped_value - 0.5) / 0.25;
+			(interpolation, 1.0, 0.0)
+		} else {
+			// Yellow → Red
+			let interpolation = (mapped_value - 0.75) / 0.25;
+			(1.0, 1.0 - interpolation, 0.0)
+		};
+
+		Color::new(red, green, blue, 1.0)
+	}
+
+	/// Draw the heatmap texture scaled to fill the screen.
+	pub fn draw(&self, screen_width: f32, screen_height: f32) {
+		let params = DrawTextureParams {
+			dest_size: Some(vec2(screen_width, screen_height)),
+			..Default::default()
+		};
+		draw_texture_ex(&self.texture, 0.0, 0.0, WHITE, params);
 	}
 }
