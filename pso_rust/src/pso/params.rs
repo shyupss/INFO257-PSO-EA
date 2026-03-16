@@ -1,13 +1,13 @@
 /// Inertia weight
 /// - Higher W: Particles explore more (keep momentum)
 /// - Lower W: Particles converge faster (less exploration)
-pub const INERTIA_WEIGHT: f64 = 3.0;
+pub const INERTIA_WEIGHT: f64 = 10.0;
 
 /// Cognitive acceleration coefficient (pull toward personal best)
-pub const COGNITIVE_COEFFICIENT: f64 = 20.0;
+pub const COGNITIVE_COEFFICIENT: f64 = 15.0;
 
 /// Social acceleration coefficient (pull toward global best)
-pub const SOCIAL_COEFFICIENT: f64 = 50.0;
+pub const SOCIAL_COEFFICIENT: f64 = 05.0;
 
 /// Lower bound of the search domain
 pub const DOMAIN_MIN: f64 = -3.0;
