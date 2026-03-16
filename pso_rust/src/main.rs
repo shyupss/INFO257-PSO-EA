@@ -176,7 +176,7 @@ async fn main() {
 
 			// Clear and draw
 			clear_background(BLACK);
-			surface.draw(screen_width(), screen_height());
+			surface.draw();
 			draw_particles(&swarm, &surface);
 			draw_global_best(&swarm, &surface);
 			draw_info_overlay(&swarm, cached_fps);

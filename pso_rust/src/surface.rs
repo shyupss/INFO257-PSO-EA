@@ -10,6 +10,9 @@ use macroquad::prelude::*;
 /// Resolution (pixels) for the heatmap texture
 const HEATMAP_RESOLUTION: u16 = 2024;
 
+/// Fixed size (pixels) for rendering the heatmap to maintaining aspect ratio
+const FIXED_SCREEN_SIZE: f32 = 800.0;
+
 /// Holds the precomputed Rastrigin heatmap texture and coordinate mapping info.
 pub struct RastriginSurface {
 	/// GPU texture of the heatmap
@@ -67,17 +70,11 @@ impl RastriginSurface {
 	}
 
 	/// Convert domain coordinates to screen (pixel) coordinates.
-	pub fn domain_to_screen(
-		&self,
-		domain_x: f64,
-		domain_y: f64,
-		screen_width: f32,
-		screen_height: f32,
-	) -> (f32, f32) {
+	pub fn domain_to_screen(&self, domain_x: f64, domain_y: f64) -> (f32, f32) {
 		let normalized_x = (domain_x - self.domain_min) / (self.domain_max - self.domain_min);
 		let normalized_y = (domain_y - self.domain_min) / (self.domain_max - self.domain_min);
-		let screen_x = normalized_x as f32 * screen_width;
-		let screen_y = normalized_y as f32 * screen_height;
+		let screen_x = normalized_x as f32 * FIXED_SCREEN_SIZE;
+		let screen_y = normalized_y as f32 * FIXED_SCREEN_SIZE;
 		(screen_x, screen_y)
 	}
 
@@ -107,10 +104,10 @@ impl RastriginSurface {
 		Color::new(red, green, blue, 1.0)
 	}
 
-	/// Draw the heatmap texture scaled to fill the screen.
-	pub fn draw(&self, screen_width: f32, screen_height: f32) {
+	/// Draw the heatmap texture scaled to a fixed screen size.
+	pub fn draw(&self) {
 		let params = DrawTextureParams {
-			dest_size: Some(vec2(screen_width, screen_height)),
+			dest_size: Some(vec2(FIXED_SCREEN_SIZE, FIXED_SCREEN_SIZE)),
 			..Default::default()
 		};
 		draw_texture_ex(&self.texture, 0.0, 0.0, WHITE, params);

@@ -9,3 +9,31 @@ rand = "0.10.0"
 
 [profile.release]
 opt-level = 3
+
+[lints.rust] # Avisos útiles del compilador base de Rust
+unsafe_code = "forbid" # Prohíbe el uso de bloques 'unsafe' (a menos que realmente los necesites)
+
+[lints.clippy]
+# --- 1. El grupo de reglas más estricto ---
+# Activa decenas de reglas que te fuerzan a escribir un código más idiomático y seguro.
+pedantic = "warn"
+
+# --- 2. Manejo de errores ---
+# Te avisa cada vez que uses .unwrap() o .expect(). 
+# Esto te obliga a usar 'match', 'if let' o el operador '?' para evitar que el programa crashee inesperadamente.
+unwrap_used = "warn"
+expect_used = "warn"
+
+# --- 3. Excepciones recomendadas para 'pedantic' ---
+# El grupo pedantic a veces es "demasiado" estricto con conversiones matemáticas
+# como transformar f64 a f32 o a u16. En simulaciones como PSO, estas conversiones son inevitables y normales,
+# por lo que es mejor decirle a Clippy que las ignore para no llenar la consola de advertencias inútiles.
+cast_precision_loss = "allow"
+cast_possible_truncation = "allow"
+cast_possible_wrap = "allow"
+cast_sign_loss = "allow"
+
+# Evita que se queje si tus funciones públicas no tienen la documentación perfecta.
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+

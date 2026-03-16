@@ -17,16 +17,9 @@ const GLOBAL_BEST_RADIUS: f32 = 8.0;
 /// Each particle is drawn as a white circle with a semi-transparent fill
 /// and an opaque border for visibility against the heatmap.
 pub fn draw_particles(swarm: &Swarm, surface: &RastriginSurface) {
-	let screen_width = screen_width();
-	let screen_height = screen_height();
-
 	for particle in &swarm.particles {
-		let (screen_x, screen_y) = surface.domain_to_screen(
-			particle.position[0],
-			particle.position[1],
-			screen_width,
-			screen_height,
-		);
+		let (screen_x, screen_y) =
+			surface.domain_to_screen(particle.position[0], particle.position[1]);
 
 		// Opaque gray fill
 		draw_circle(
@@ -48,15 +41,8 @@ pub fn draw_particles(swarm: &Swarm, surface: &RastriginSurface) {
 
 /// Draw the global best position as a pulsing red marker.
 pub fn draw_global_best(swarm: &Swarm, surface: &RastriginSurface) {
-	let screen_width = screen_width();
-	let screen_height = screen_height();
-
-	let (screen_x, screen_y) = surface.domain_to_screen(
-		swarm.global_best_pos[0],
-		swarm.global_best_pos[1],
-		screen_width,
-		screen_height,
-	);
+	let (screen_x, screen_y) =
+		surface.domain_to_screen(swarm.global_best_pos[0], swarm.global_best_pos[1]);
 
 	// Pulsing effect using sine wave on the elapsed time
 	let pulse = 1.0 + 0.3 * (get_time() as f32 * 4.0).sin();
@@ -117,7 +103,7 @@ pub fn draw_info_overlay(swarm: &Swarm, cached_fps: i32) {
 			swarm.global_best_pos[0], swarm.global_best_pos[1]
 		),
 		format!("Found at iteration: {}", swarm.best_iteration),
-		format!("FPS: {}", cached_fps),
+		format!("FPS: {cached_fps}"),
 	];
 
 	for line in &lines {
