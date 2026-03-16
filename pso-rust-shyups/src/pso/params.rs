@@ -5,7 +5,7 @@ pub const Y_MIN: f32 = -3.0;
 pub const Y_MAX: f32 = 7.0;
  
 // === PARÁMETROS PSO ===
-pub const N_PARTICULAS: usize = 100;
+pub const N_PARTICULAS: usize = 1000;
 pub const V_MAX: f32 = 0.02;
 pub const W: f32 = 0.99;   // inercia
 pub const C1: f32 = 15.0;  // componente cognitivo

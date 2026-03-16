@@ -23,24 +23,24 @@ fn rastrigin(x1: f32, x2: f32) -> f32 {
 fn valor_a_color(t: f32) -> [u8; 3] {
     // 0.0 = mínimo → azul
     // 1.0 = máximo → rojo
-    let (r, g, b) = if t < 0.25 {
-        // cian → azul
-        let s = (t - 0.75) / 0.25;
-        (0.0, 1.0 - s, 1.0)
-    } else if t < 0.5 {
-        // verde → cian
-        let s = (t - 0.5) / 0.25;
-        (0.0, 1.0, s)
-    } else if t < 0.75 {
-        // amarillo → verde
-        let s = (t - 0.25) / 0.25;
-        (1.0 - s, 1.0, 0.0)
-    } else {
-        // rojo → amarillo
+    let (r, g, b): (f32, f32, f32) = if t < 0.25 {
+        // azul → cian
         let s = t / 0.25;
-        (1.0, s, 0.0)
+        (0.0, s, 1.0)
+    } else if t < 0.5 {
+        // cian → verde
+        let s = (t - 0.25) / 0.25;
+        (0.0, 1.0, 1.0 - s)
+    } else if t < 0.75 {
+        // verde → amarillo
+        let s = (t - 0.5) / 0.25;
+        (s, 1.0, 0.0)
+    } else {
+        // amarillo → rojo
+        let s = (t - 0.75) / 0.25;
+        (1.0, 1.0 - s, 0.0)
     };
- 
+
     [(r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8]
 }
 
