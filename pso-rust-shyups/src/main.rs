@@ -11,7 +11,7 @@ use pso::swarm::Swarm;
 fn config() -> Conf {
     Conf {
         window_title: "PSO - Rastrigin".to_string(),
-        window_width: 800,
+        window_width: 800,  
         window_height: 800,
         ..Default::default()
     }
