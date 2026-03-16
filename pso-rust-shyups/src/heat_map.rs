@@ -1,4 +1,3 @@
-// coded by IA...
 use image::{ImageBuffer, Rgb};
 
 // === CONFIGURACIÓN ===
