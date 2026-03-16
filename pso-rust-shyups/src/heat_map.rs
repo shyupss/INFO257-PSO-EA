@@ -9,6 +9,8 @@ const ALTO: u32 = 800;
 const X_MIN: f32 = -3.0;
 const X_MAX: f32 = 7.0;
 const Y_MIN: f32 = -3.0;
+const Y_MAX: f32 = 7.0;
+
 // === FUNCIÓN RASTRIGIN 2D ===
 fn rastrigin(x1: f32, x2: f32) -> f32 {
     let pi = std::f32::consts::PI;
