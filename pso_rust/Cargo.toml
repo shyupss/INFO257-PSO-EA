@@ -15,8 +15,8 @@ unsafe_code = "forbid" # Prohíbe el uso de bloques 'unsafe' (a menos que realme
 
 [lints.clippy]
 # --- 1. El grupo de reglas más estricto ---
-# Activa decenas de reglas que te fuerzan a escribir un código más idiomático y seguro.
-pedantic = "warn"
+# Activa decenas de reglas que te fuerzan a escribir un código más idiomático y seguro, prioridad -1 para que 3. funcione.
+pedantic = { level = "warn", priority = -1 }
 
 # --- 2. Manejo de errores ---
 # Te avisa cada vez que uses .unwrap() o .expect(). 

@@ -1,7 +1,7 @@
 use rand::RngExt;
 use std::f64::consts::PI;
 
-use super::params::*;
+use super::params::{DOMAIN_MIN, DOMAIN_MAX, MAX_VELOCITY, INERTIA_WEIGHT, COGNITIVE_COEFFICIENT, SOCIAL_COEFFICIENT};
 
 /// Rastrigin function for 2D input.
 /// Global minimum: f(0, 0) = 0

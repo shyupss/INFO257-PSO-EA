@@ -49,7 +49,7 @@ impl RastriginSurface {
 				let value = rastrigin([domain_x, domain_y]);
 				let normalized = (value / max_value) as f32;
 				let color = Self::value_to_color(normalized);
-				image.set_pixel(pixel_x as u32, pixel_y as u32, color);
+				image.set_pixel(u32::from(pixel_x), u32::from(pixel_y), color);
 			}
 		}
 
@@ -65,7 +65,7 @@ impl RastriginSurface {
 
 	/// Convert a pixel coordinate to the domain value.
 	fn pixel_to_domain(pixel: u16, resolution: u16) -> f64 {
-		let ratio = pixel as f64 / (resolution - 1) as f64;
+		let ratio = f64::from(pixel) / f64::from(resolution - 1);
 		DOMAIN_MIN + ratio * (DOMAIN_MAX - DOMAIN_MIN)
 	}
 
