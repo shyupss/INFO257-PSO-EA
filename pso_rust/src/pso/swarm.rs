@@ -28,9 +28,10 @@ impl Swarm {
 		let (global_best_pos, global_best_value) = particles
 			.iter()
 			.map(|particle| (particle.position, particle.current_fitness))
-			.min_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
-			.map(|(pos, val)| ([pos[0], pos[1]], val))
-			.unwrap();
+			.min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal))
+			.map_or(([0.0, 0.0], f64::INFINITY), |(pos, val)| {
+				([pos[0], pos[1]], val)
+			});
 
 		Swarm {
 			particles,

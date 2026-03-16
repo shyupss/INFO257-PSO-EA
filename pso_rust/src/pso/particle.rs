@@ -1,7 +1,9 @@
 use rand::RngExt;
 use std::f64::consts::PI;
 
-use super::params::{DOMAIN_MIN, DOMAIN_MAX, MAX_VELOCITY, INERTIA_WEIGHT, COGNITIVE_COEFFICIENT, SOCIAL_COEFFICIENT};
+use super::params::{
+	COGNITIVE_COEFFICIENT, DOMAIN_MAX, DOMAIN_MIN, INERTIA_WEIGHT, MAX_VELOCITY, SOCIAL_COEFFICIENT,
+};
 
 /// Rastrigin function for 2D input.
 /// Global minimum: f(0, 0) = 0
@@ -67,13 +69,18 @@ impl Particle {
 	}
 
 	pub fn update(&mut self, global_best: &[f64; 2], rng: &mut rand::rngs::ThreadRng) {
-		let r1: f64 = rng.random_range(0.0..=1.0);
-		let r2: f64 = rng.random_range(0.0..=1.0);
+		// The original r1 and r2 were outside the loop.
+		// The user's snippet moved them inside and used `rand::gen_range`.
+		// To maintain consistency with the existing `rng` and `random_range` usage,
+		// and to generate new random numbers for each dimension, we'll generate them inside the loop.
 
-		for i in 0..2 {
+		for (i, &global_best_val) in global_best.iter().enumerate().take(2) {
+			let r1: f64 = rng.random_range(0.0..=1.0);
+			let r2: f64 = rng.random_range(0.0..=1.0);
+
 			self.velocity[i] = INERTIA_WEIGHT * self.velocity[i]
 				+ COGNITIVE_COEFFICIENT * r1 * (self.personal_best_pos[i] - self.position[i])
-				+ SOCIAL_COEFFICIENT * r2 * (global_best[i] - self.position[i]);
+				+ SOCIAL_COEFFICIENT * r2 * (global_best_val - self.position[i]);
 
 			self.velocity[i] = self.velocity[i].clamp(-MAX_VELOCITY, MAX_VELOCITY);
 			self.position[i] += self.velocity[i];
