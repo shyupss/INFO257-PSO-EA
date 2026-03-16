@@ -30,11 +30,11 @@ async fn main() {
     let fondo = macroquad::texture::load_texture("heat_map.png").await.unwrap();
     // inicializar swarm
     let mut swarm = Swarm::inicializar();
-    // loop principal (por ahora solo muestra la imagen)
+    // loop principal
     loop {
         swarm.actualizar();
         renderer::dibujar(&fondo, &swarm);
-        // Limita a 10 FPS (puedes cambiar el número)
+        // limitar a 60 FPS
         std::thread::sleep(std::time::Duration::from_millis(1000/60));
         next_frame().await;
     }
