@@ -1,5 +1,4 @@
 import pygame
-import math
 import numpy as np
 
 class Rastrigin:
@@ -16,7 +15,7 @@ class Rastrigin:
 
     @staticmethod
     def evaluate(x, y):
-        return 20 + (x**2 - 10 * math.cos(2 * math.pi * x)) + (y**2 - 10 * math.cos(2 * math.pi * y))
+        return 20 + (x**2 - 10 * np.cos(2 * np.pi * x)) + (y**2 - 10 * np.cos(2 * np.pi * y))
 
     
     def generate(self):
@@ -31,7 +30,7 @@ class Rastrigin:
         image = np.dstack(self.color_map(Z))
         self.image = pygame.surfarray.make_surface(image.swapaxes(0, 1))
 
-        return self.imagen
+        return self.image
 
 
     def color_map(self, Z):
