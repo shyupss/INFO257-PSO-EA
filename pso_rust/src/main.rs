@@ -58,69 +58,69 @@ const NUM_RUNS: usize = 30;
 // ============================================================================
 
 /// Calculate statistics from multiple PSO runs.
-/// Returns (min, max, mean, std_deviation, success_count).
+/// Returns (min, max, mean, `std_deviation`, `success_count`).
 fn calculate_stats(results: &[RunResult]) -> (f64, f64, f64, f64, usize) {
-    let values: Vec<f64> = results.iter().map(|r| r.best_value).collect();
-    let min = values.iter().cloned().fold(f64::INFINITY, f64::min);
-    let max = values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
-    let mean = values.iter().sum::<f64>() / values.len() as f64;
-    let standard_deviation =
-        (values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / values.len() as f64).sqrt();
-    let successes = values.iter().filter(|&&v| v < 0.01).count();
-    (min, max, mean, standard_deviation, successes)
+	let values: Vec<f64> = results.iter().map(|r| r.best_value).collect();
+	let min = values.iter().copied().fold(f64::INFINITY, f64::min);
+	let max = values.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+	let mean = values.iter().sum::<f64>() / values.len() as f64;
+	let standard_deviation =
+		(values.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / values.len() as f64).sqrt();
+	let successes = values.iter().filter(|&&v| v < 0.01).count();
+	(min, max, mean, standard_deviation, successes)
 }
 
-/// Run PSO in console batch mode: execute NUM_RUNS independent runs,
+/// Run PSO in console batch mode: execute `NUM_RUNS` independent runs,
 /// print per-run results, and display aggregate statistics.
 fn run_console_mode() {
-    println!("╔═══════════════════════════════════════════════════════════════╗");
-    println!("║  PSO - Minimización de la Función Rastrigin en 2D            ║");
-    println!("╚═══════════════════════════════════════════════════════════════╝");
-    println!();
-    println!("Función: f(x₁, x₂) = 20 + x₁² - 10·cos(2πx₁) + x₂² - 10·cos(2πx₂)");
-    println!("Dominio: {:.1} < xᵢ < {:.1}", DOMAIN_MIN, DOMAIN_MAX);
-    println!("Mínimo global: f(0, 0) = 0");
-    println!();
+	println!("╔═══════════════════════════════════════════════════════════════╗");
+	println!("║  PSO - Minimización de la Función Rastrigin en 2D            ║");
+	println!("╚═══════════════════════════════════════════════════════════════╝");
+	println!();
+	println!("Función: f(x₁, x₂) = 20 + x₁² - 10·cos(2πx₁) + x₂² - 10·cos(2πx₂)");
+	println!("Dominio: {DOMAIN_MIN:.1} < xᵢ < {DOMAIN_MAX:.1}");
+	println!("Mínimo global: f(0, 0) = 0");
+	println!();
 
-    let mut results: Vec<RunResult> = Vec::with_capacity(NUM_RUNS);
+	let mut results: Vec<RunResult> = Vec::with_capacity(NUM_RUNS);
 
-    println!("Ejecutando {} corridas independientes...\n", NUM_RUNS);
-    println!(
-        "{:>8} {:>15} {:>15} {:>15} {:>10}",
-        "Corrida", "x₁", "x₂", "f(x₁,x₂)", "Iter"
-    );
-    println!("{}", "-".repeat(67));
+	println!("Ejecutando {NUM_RUNS} corridas independientes...\n");
+	println!(
+		"{:>8} {:>15} {:>15} {:>15} {:>10}",
+		"Corrida", "x₁", "x₂", "f(x₁,x₂)", "Iter"
+	);
+	println!("{}", "-".repeat(67));
 
-    for run in 1..=NUM_RUNS {
-        let mut swarm = Swarm::new();
-        let result = swarm.run();
-        println!(
-            "{:>8} {:>15.8} {:>15.8} {:>15.8} {:>10}",
-            run,
-            result.best_position[0],
-            result.best_position[1],
-            result.best_value,
-            result.iterations_to_best
-        );
-        results.push(result);
-    }
+	for run in 1..=NUM_RUNS {
+		let mut swarm = Swarm::new();
+		let result = swarm.run();
+		println!(
+			"{:>8} {:>15.8} {:>15.8} {:>15.8} {:>10}",
+			run,
+			result.best_position[0],
+			result.best_position[1],
+			result.best_value,
+			result.iterations_to_best
+		);
+		results.push(result);
+	}
 
-    let (min, max, mean, standard_deviation, successes) = calculate_stats(&results);
+	let (min, max, mean, standard_deviation, successes) = calculate_stats(&results);
 
-    println!();
-    println!("┌─────────────────────────────────────────┐");
-    println!("│ Estadísticas sobre {} corridas:          │", NUM_RUNS);
-    println!("├─────────────────────────────────────────┤");
-    println!("│ Mínimo:  {:>30.8} │", min);
-    println!("│ Máximo:  {:>30.8} │", max);
-    println!("│ Media:   {:>30.8} │", mean);
-    println!("│ Std Dev: {:>30.8} │", standard_deviation);
-    println!("│ Éxitos (f < 0.01): {:>20} │", successes);
-    println!(
-        "│ Tasa de éxito: {:>22.1}% │",
-        (successes as f64 / NUM_RUNS as f64) * 100.0
-    );
-    println!("└─────────────────────────────────────────┘");
+	println!();
+	println!("┌─────────────────────────────────────────┐");
+	println!("│ Estadísticas sobre {NUM_RUNS} corridas:          │");
+	println!("├─────────────────────────────────────────┤");
+	println!("│ Mínimo:  {min:>30.8} │");
+	println!("│ Máximo:  {max:>30.8} │");
+	println!("│ Media:   {mean:>30.8} │");
+	println!("│ Std Dev: {standard_deviation:>30.8} │");
+	println!("│ Éxitos (f < 0.01): {successes:>20} │");
+	println!(
+		"│ Tasa de éxito: {:>22.1}% │",
+		(successes as f64 / NUM_RUNS as f64) * 100.0
+	);
+	println!("└─────────────────────────────────────────┘");
 }
 
 // ============================================================================
@@ -129,61 +129,61 @@ fn run_console_mode() {
 
 /// Window configuration for macroquad (used in both modes).
 fn window_configuration() -> Conf {
-    Conf {
-        window_title: "PSO - Rastrigin Function Visualization (Q/ESC to quit)".to_string(),
-        window_width: 800,
-        window_height: 800,
-        window_resizable: true,
-        ..Default::default()
-    }
+	Conf {
+		window_title: "PSO - Rastrigin Function Visualization (Q/ESC to quit)".to_string(),
+		window_width: 800,
+		window_height: 800,
+		window_resizable: true,
+		..Default::default()
+	}
 }
 
 #[macroquad::main(window_configuration)]
 async fn main() {
-    if VISUAL_MODE {
-        // Generate the Rastrigin heatmap (done once at startup)
-        let surface = RastriginSurface::new();
+	if VISUAL_MODE {
+		// Generate the Rastrigin heatmap (done once at startup)
+		let surface = RastriginSurface::new();
 
-        // Create the particle swarm
-        let mut swarm = Swarm::new();
+		// Create the particle swarm
+		let mut swarm = Swarm::new();
 
-        // Timers for throttled stepping and FPS refresh
-        let mut step_accumulator: f64 = 0.0;
-        let mut fps_accumulator: f64 = 0.0;
-        let mut cached_fps: i32 = 0;
+		// Timers for throttled stepping and FPS refresh
+		let mut step_accumulator: f64 = 0.0;
+		let mut fps_accumulator: f64 = 0.0;
+		let mut cached_fps: i32 = 0;
 
-        // Main game loop
-        loop {
-            if should_quit() {
-                break;
-            }
+		// Main game loop
+		loop {
+			if should_quit() {
+				break;
+			}
 
-            let delta_time = get_frame_time() as f64;
+			let delta_time = f64::from(get_frame_time());
 
-            // ---- Throttled PSO stepping ----
-            step_accumulator += delta_time;
-            while step_accumulator >= STEP_INTERVAL {
-                swarm.step();
-                step_accumulator -= STEP_INTERVAL;
-            }
+			// ---- Throttled PSO stepping ----
+			step_accumulator += delta_time;
+			while step_accumulator >= STEP_INTERVAL {
+				swarm.step();
+				step_accumulator -= STEP_INTERVAL;
+			}
 
-            // ---- FPS refresh once per second ----
-            fps_accumulator += delta_time;
-            if fps_accumulator >= FPS_REFRESH_INTERVAL {
-                cached_fps = get_fps();
-                fps_accumulator -= FPS_REFRESH_INTERVAL;
-            }
+			// ---- FPS refresh once per second ----
+			fps_accumulator += delta_time;
+			if fps_accumulator >= FPS_REFRESH_INTERVAL {
+				cached_fps = get_fps();
+				fps_accumulator -= FPS_REFRESH_INTERVAL;
+			}
 
-            // Clear and draw
-            clear_background(BLACK);
-            surface.draw(screen_width(), screen_height());
-            draw_particles(&swarm, &surface);
-            draw_global_best(&swarm, &surface);
-            draw_info_overlay(&swarm, cached_fps);
+			// Clear and draw
+			clear_background(BLACK);
+			surface.draw();
+			draw_particles(&swarm, &surface);
+			draw_global_best(&swarm, &surface);
+			draw_info_overlay(&swarm, cached_fps);
 
-            next_frame().await;
-        }
-    } else {
-        run_console_mode();
-    }
+			next_frame().await;
+		}
+	} else {
+		run_console_mode();
+	}
 }
