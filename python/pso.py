@@ -37,6 +37,7 @@ class Simulacion:
 
         self.clock = pygame.time.Clock()
         self.running = True
+        self.iteracion = 0
 
     # Main loop
     def run(self):
@@ -44,7 +45,7 @@ class Simulacion:
             self.handle_events()
             self.update()
             self.render()
-            self.clock.tick(60)  # 60 FPS
+            self.clock.tick(24)
 
         pygame.quit()
 
@@ -76,6 +77,8 @@ class Simulacion:
                 max_vel = self.max_velocity
             )
 
+        self.iteracion += 1
+
 
     # Renderizar assets y objetos
     def render(self):
@@ -91,6 +94,7 @@ class Simulacion:
         # Dibujar información
         self.information.render(self.screen, 
             {
+                "Iteración": self.iteracion,
                 "Cantidad de partículas": len(self.particles),
                 "Mejor posición global": f"({self.gbest[0]:0.2f}, {self.gbest[1]:0.2f})",
                 "Fitness global": self.gbest_fitness,
