@@ -19,9 +19,9 @@ class Simulacion:
         self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         # Parámetros de las partículas
-        self.learning_c1 = 1.5
+        self.learning_c1 = 3
         self.learning_c2 = 10
-        self.inercia = 10
+        self.inercia = 100
         self.max_velocity = 4
 
         self.gbest = (0, 0)
@@ -29,7 +29,7 @@ class Simulacion:
 
         # Generación de partículas
         self.particles = [
-            Particle(self.screen) for _ in range(50)
+            Particle(self.screen) for _ in range(200)
         ]
 
         # Panel de información

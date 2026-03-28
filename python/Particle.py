@@ -4,7 +4,7 @@ import math
 from Rastrigin import Rastrigin
 
 class Particle:
-    def __init__(self, screen: pygame.Surface, radius = 8, color = (170, 0, 255)):
+    def __init__(self, screen: pygame.Surface, radius = 4, color = (255, 255, 255)):
         self.color = color
         self.radius = radius
 
@@ -36,14 +36,13 @@ class Particle:
         )
 
     def draw(self, screen):
-        screen.blit(self.image, dest = (int(self.x), int(self.y)))
-        # pygame.draw.circle(
-        #     screen,
-        #     self.color,
-        #     (int(self.x), int(self.y)),
-        #     self.radius,
-        #     width = 2
-        # )
+        # screen.blit(self.image, dest = (int(self.x), int(self.y)))
+        pygame.draw.circle(
+            screen,
+            self.color,
+            (int(self.x), int(self.y)),
+            self.radius
+        )
 
 
     def evaluate(self):
@@ -68,8 +67,8 @@ class Particle:
         px, py = random.random(), random.random()
 
         # Actualizar la velocidad
-        self.vx = self.vx + c1 * px * (self.px - self.x) + c2 * px * (gbest[0] - self.x)
-        self.vy = self.vy + c1 * py * (self.py - self.y) + c2 * py * (gbest[1] - self.y)
+        self.vx =  w * self.vx + c1 * px * (self.px - self.x) + c2 * px * (gbest[0] - self.x)
+        self.vy =  w * self.vy + c1 * py * (self.py - self.y) + c2 * py * (gbest[1] - self.y)
 
         # self.vx = w * self.vx + px * (self.px - self.x) + px * (gbest[0] - self.x)
         # self.vy = w * self.vy + py * (self.py - self.y) + py * (gbest[1] - self.y)
