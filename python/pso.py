@@ -1,6 +1,6 @@
 import pygame
 
-from Particle import Particle
+from PSOParticle import Particle
 from InformationTab import InformationTab
 from Rastrigin import Rastrigin
 
