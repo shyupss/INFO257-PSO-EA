@@ -1,6 +1,10 @@
 import pygame
 
 class InformationTab():
+    '''
+    Renderiza en pantalla un recuadro con información útil en la simulación
+    '''
+
     def __init__(self, position = (10, 10), padding = 10):
         self.position = position
         self.padding = padding

@@ -5,6 +5,10 @@ from InformationTab import InformationTab
 from Rastrigin import Rastrigin
 
 class Simulacion:
+    '''
+    Simulación del algoritmo Particle Swarm Optimization
+    '''
+    
     def __init__(self):
         pygame.init()
 

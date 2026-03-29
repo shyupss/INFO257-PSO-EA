@@ -4,6 +4,10 @@ import numpy as np
 from Rastrigin import Rastrigin
 
 class Particle:
+    '''
+    Partícula para la simulación de el algoritmo evolutivo "Algoritmo Genético"
+    '''
+
     def __init__(self, screen: pygame.Surface, radius = 4, color = (255, 255, 255)):
         self.color = color
         self.radius = radius

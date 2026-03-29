@@ -4,6 +4,10 @@ from InformationTab import InformationTab
 from Rastrigin import Rastrigin
 
 class Simulacion:
+    '''
+    Simulación del algoritmo evolutivo "Algoritmo genético"
+    '''
+
     def __init__(self):
         pygame.init()
 

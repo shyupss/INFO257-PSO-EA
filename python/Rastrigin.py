@@ -2,6 +2,10 @@ import pygame
 import numpy as np
 
 class Rastrigin:
+    '''
+    Genera el mapa de calor de la funcion Rastrigin como un pygame.Surface
+    '''
+    
     def __init__(self, width, height, dominio_min = -3, dominio_max = 7):
         self.width = width
         self.height = height
