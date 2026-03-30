@@ -17,11 +17,11 @@ class Simulacion:
         self.N = 50                                 # Tamaño de población
         self.K = 3                                  # Tamaño del torneo
         self.Pc = 0.8                               # Probabilidad de cruzamiento
-        self.Pm = 1 / LONGITUD_CROMOSOMA            # Pm balanceada
+        self.Pm = 1 / LONGITUD_CROMOSOMA            # Probabilidad de mutación
         self.modo_reinsercion = 1                   # 1 = generacional, 2 = steady state
 
-        self.width = 700
-        self.height = 700
+        self.width = 900
+        self.height = 900
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Algoritmo Genético")
