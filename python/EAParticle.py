@@ -3,6 +3,15 @@ import random
 import numpy as np
 from Rastrigin import Rastrigin
 
+
+DOMINIO_MIN = -3
+DOMINIO_MAX = 7
+DOMINIO_SIZE = DOMINIO_MAX - DOMINIO_MIN
+ 
+BITS_POR_VAR = 16
+LONGITUD_CROMOSOMA = BITS_POR_VAR * 2
+
+
 class Particle:
     '''
     Partícula para la simulación de el algoritmo evolutivo "Algoritmo Genético"
@@ -12,54 +21,57 @@ class Particle:
         self.color = color
         self.radius = radius
 
-        self.image = pygame.image.load("assets/particle.png").convert_alpha()
         w, h = screen.get_size()
         self.width = w
         self.height = h
 
-        # Posición
-        self.x = random.uniform(0, w)
-        self.y = random.uniform(0, h)
-
-        # Velocidad
-        self.vx = random.uniform(-1, 1)
-        self.vy = random.uniform(-1, 1)
-
-        # Posición del personal best
-        self.px = self.x
-        self.py = self.y
-
-        # Personal best
-        self.pbest = -999999
+        self.cromosoma = [random.randint(0, 1) for _ in range(LONGITUD_CROMOSOMA)]
+ 
+        self.fitness = None
+        self.evaluate()
 
 
-    def translate_coords_to_dom(self):
-        return (
-            -3 + (self.x / self.width) * 10,
-            -3 + (self.y / self.height) * 10
-        )
+    def decode(self):
+        '''
+        Decodifica el cromosoma binario
+        '''
+        max_val = (2 ** BITS_POR_VAR) - 1
+ 
+        int_x = int(''.join(str(b) for b in self.cromosoma[:BITS_POR_VAR]), 2)
+        int_y = int(''.join(str(b) for b in self.cromosoma[BITS_POR_VAR:]), 2)
+ 
+        x = DOMINIO_MIN + (int_x / max_val) * DOMINIO_SIZE
+        y = DOMINIO_MIN + (int_y / max_val) * DOMINIO_SIZE
+ 
+        return x, y
+
+
+    def translate_coords_to_screen(self):
+        x, y = self.decode()
+    
+        px = (x - DOMINIO_MIN) / DOMINIO_SIZE * self.width
+        py = (y - DOMINIO_MIN) / DOMINIO_SIZE * self.height
+
+        return px, py
 
     def draw(self, screen):
-        # screen.blit(self.image, dest = (int(self.x), int(self.y)))
+        px, py = self.translate_coords_to_screen()
+
         pygame.draw.circle(
             screen,
             self.color,
-            (int(self.x), int(self.y)),
+            (int(px), int(py)),
             self.radius
         )
 
 
     def evaluate(self):
-        x, y = self.translate_coords_to_dom()
-        fitness = -Rastrigin.evaluate(x, y)
+        x, y = self.decode()
+        self.fitness = -Rastrigin.evaluate(x, y)
 
-        if fitness > self.pbest:
-            self.pbest = fitness
-            self.px = self.x
-            self.py = self.y
-
-        return fitness
+        return self.fitness
 
 
-    def move(self, screen, gbest):
-        ...
+    def move(self, cromosoma):
+        self.cromosoma = cromosoma
+        self.evaluate()
