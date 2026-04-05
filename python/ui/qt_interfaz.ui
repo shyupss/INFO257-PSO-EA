@@ -71,7 +71,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>50</string>
+      <string>Default: 50</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_c1">
@@ -84,7 +84,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>3</string>
+      <string>Default: 3.0</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_c2">
@@ -97,7 +97,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>10</string>
+      <string>Default: 10.0</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_w">
@@ -110,7 +110,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>100</string>
+      <string>Default: 100.0</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_vel">
@@ -123,7 +123,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>4</string>
+      <string>Default: 4.0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -330,7 +330,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>230</y>
+       <y>250</y>
        <width>301</width>
        <height>21</height>
       </rect>
@@ -349,35 +349,7 @@
 }</string>
      </property>
      <property name="text">
-      <string>Criterio de término</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_18">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>250</y>
-       <width>301</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel {
-	border: none;
-	color: #888888;
-}</string>
-     </property>
-     <property name="text">
-      <string>Innecesario si es que no se desea extraer gráficos</string>
+      <string>Configuración de la simulación</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -386,21 +358,21 @@
     <widget class="QLineEdit" name="max_gen_pso">
      <property name="geometry">
       <rect>
-       <x>182</x>
-       <y>270</y>
+       <x>180</x>
+       <y>280</y>
        <width>131</width>
        <height>20</height>
       </rect>
      </property>
      <property name="placeholderText">
-      <string>200</string>
+      <string>Default: None</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_22">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>270</y>
+       <x>8</x>
+       <y>280</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -418,6 +390,46 @@
      </property>
      <property name="text">
       <string>Generación máxima</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="iter_pso">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>310</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>Default: 1</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_23">
+     <property name="geometry">
+      <rect>
+       <x>8</x>
+       <y>310</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel {
+	border: none;
+}</string>
+     </property>
+     <property name="text">
+      <string>Cantidad de iteraciones</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -481,7 +493,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>3</string>
+      <string>Default: 3</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_pc">
@@ -494,7 +506,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>0.8</string>
+      <string>Default: 0.8</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
@@ -588,7 +600,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>0.03</string>
+      <string>Default: 0.03</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="ea_n">
@@ -601,7 +613,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>50</string>
+      <string>Default: 50</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
@@ -667,40 +679,22 @@
        <height>22</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QLabel" name="label_20">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>250</y>
-       <width>301</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLabel {
-	border: none;
-	color: #888888;
-}</string>
-     </property>
-     <property name="text">
-      <string>Innecesario si es que no se desea extraer gráficos</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
+     <item>
+      <property name="text">
+       <string>Generacional</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Steady state</string>
+      </property>
+     </item>
     </widget>
     <widget class="QLabel" name="label_19">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>230</y>
+       <y>250</y>
        <width>301</width>
        <height>21</height>
       </rect>
@@ -719,7 +713,7 @@
 }</string>
      </property>
      <property name="text">
-      <string>Criterio de término</string>
+      <string>Configuración de la simulación</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -794,7 +788,7 @@
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>270</y>
+       <y>280</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -803,14 +797,14 @@
       <string/>
      </property>
      <property name="placeholderText">
-      <string>200</string>
+      <string>Default: None</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_24">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>270</y>
+       <y>280</y>
        <width>161</width>
        <height>21</height>
       </rect>
@@ -831,6 +825,46 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_25">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>310</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel {
+	border: none;
+}</string>
+     </property>
+     <property name="text">
+      <string>Cantidad de iteraciones</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="iter_ea">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>310</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>Default: 1</string>
      </property>
     </widget>
    </widget>

@@ -10,15 +10,22 @@ class Simulacion:
     Simulación del algoritmo evolutivo "Algoritmo genético"
     '''
 
-    def __init__(self):
+    def __init__(self,
+        max_gen: int = None,
+        n: int = 200, 
+        k: int = 3, 
+        pc: float = 0.8, 
+        pm: float = 0.03, 
+        reinsercion: int = 1
+    ):
         pygame.init()
 
         # Parámetros del algoritmo genético
-        self.N = 50                                 # Tamaño de población
-        self.K = 3                                  # Tamaño del torneo
-        self.Pc = 0.8                               # Probabilidad de cruzamiento
-        self.Pm = 0.03                              # Probabilidad de mutación
-        self.modo_reinsercion = 1                   # 1 = generacional, 2 = steady state
+        self.N = n                              # Tamaño de población
+        self.K = k                              # Tamaño del torneo
+        self.Pc = pc                            # Probabilidad de cruzamiento
+        self.Pm = pm                            # Probabilidad de mutación
+        self.modo_reinsercion = reinsercion     # 1 = generacional, 2 = steady state
 
         self.width = 900
         self.height = 900
@@ -29,6 +36,8 @@ class Simulacion:
         rastrigin_map = Rastrigin(self.width, self.height)
         self.bg = rastrigin_map.generate()
         self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
+
+        self.max_gen = max_gen
 
         # Parámetros de las partículas
         self.gbest_cromosoma = None
@@ -41,10 +50,16 @@ class Simulacion:
 
         # Panel de información
         self.information = InformationTab()
+        self.tutorial = self.information.font.render(
+            "[Barra espaciadora] para reproducir, presiona cualquier tecla para avanzar una iteración.",
+            True,
+            (0, 0, 0)
+        )
 
         self.clock = pygame.time.Clock()
         self.running = True
         self.reproduciendo = False
+        self.stop = False
         self.generacion = 0
 
 
@@ -53,7 +68,7 @@ class Simulacion:
         while self.running:
             self.handle_events()
 
-            if self.reproduciendo:
+            if self.reproduciendo and not self.stop:
                 self.update()
 
             self.render()
@@ -68,7 +83,7 @@ class Simulacion:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.reproduciendo = not self.reproduciendo
-                else:
+                elif not self.stop:
                     self.update()
 
             if event.type == pygame.QUIT:
@@ -83,6 +98,9 @@ class Simulacion:
             self._steady_state()
 
         self.generacion += 1
+
+        if self.max_gen is not None and self.generacion >= self.max_gen:
+            self.stop = True
 
     # Selección
     def _torneo(self):
@@ -226,7 +244,7 @@ class Simulacion:
         # Dibujar información
         self.information.render(self.screen, 
             {
-                "Estado": estado_str,
+                "Estado": estado_str if not self.stop else "Máximo de generaciones alcanzado",
                 "Modo de reinserción": modo_str,
                 "Generación": self.generacion,
                 "Población (N)": self.N,
@@ -237,6 +255,8 @@ class Simulacion:
                 "Mejor fitness": f"{self.gbest_fitness:.4f}",
             }
         )
+
+        self.screen.blit(self.tutorial, (10, self.height - self.tutorial.height))
 
         pygame.display.flip()
 
