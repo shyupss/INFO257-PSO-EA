@@ -80,7 +80,7 @@ class Simulacion:
         if self.modo_reinsercion == 1:
             self._generacional()
         else:
-            self.steady_state()
+            self._steady_state()
 
         self.generacion += 1
 
