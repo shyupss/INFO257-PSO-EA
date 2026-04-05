@@ -3,8 +3,8 @@
 //! Replaces the old image-loading approach with a procedurally generated
 //! heatmap of the Rastrigin function over the search domain.
 
-use crate::pso::params::{DOMAIN_MAX, DOMAIN_MIN};
-use crate::pso::particle::rastrigin;
+use crate::ea::individual::rastrigin;
+use crate::ea::params::{DOMAIN_MAX, DOMAIN_MIN};
 use macroquad::prelude::*;
 
 /// Resolution (pixels) for the heatmap texture

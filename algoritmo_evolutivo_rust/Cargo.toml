@@ -1,5 +1,5 @@
 [package]
-name = "pso_rust"
+name = "algoritmo_evolutivo_rust"
 version = "0.1.0"
 edition = "2024"
 
@@ -19,14 +19,14 @@ unsafe_code = "forbid" # Prohíbe el uso de bloques 'unsafe' (a menos que realme
 pedantic = { level = "warn", priority = -1 }
 
 # --- 2. Manejo de errores ---
-# Te avisa cada vez que uses .unwrap() o .expect(). 
+# Te avisa cada vez que uses .unwrap() o .expect().
 # Esto te obliga a usar 'match', 'if let' o el operador '?' para evitar que el programa crashee inesperadamente.
 unwrap_used = "warn"
 expect_used = "warn"
 
 # --- 3. Excepciones recomendadas para 'pedantic' ---
 # El grupo pedantic a veces es "demasiado" estricto con conversiones matemáticas
-# como transformar f64 a f32 o a u16. En simulaciones como PSO, estas conversiones son inevitables y normales,
+# como transformar f64 a f32 o a u16. En simulaciones como EA, estas conversiones son inevitables y normales,
 # por lo que es mejor decirle a Clippy que las ignore para no llenar la consola de advertencias inútiles.
 cast_precision_loss = "allow"
 cast_possible_truncation = "allow"
@@ -36,4 +36,3 @@ cast_sign_loss = "allow"
 # Evita que se queje si tus funciones públicas no tienen la documentación perfecta.
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
-

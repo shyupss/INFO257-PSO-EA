@@ -1,10 +1,14 @@
 import pygame
 
-from Particle import Particle
+from PSOParticle import Particle
 from InformationTab import InformationTab
 from Rastrigin import Rastrigin
 
 class Simulacion:
+    '''
+    Simulación del algoritmo Particle Swarm Optimization
+    '''
+    
     def __init__(self):
         pygame.init()
 
@@ -19,9 +23,9 @@ class Simulacion:
         self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         # Parámetros de las partículas
-        self.learning_c1 = 1.5
+        self.learning_c1 = 3
         self.learning_c2 = 10
-        self.inercia = 10
+        self.inercia = 100
         self.max_velocity = 4
 
         self.gbest = (0, 0)
@@ -29,7 +33,7 @@ class Simulacion:
 
         # Generación de partículas
         self.particles = [
-            Particle(self.screen) for _ in range(50)
+            Particle(self.screen) for _ in range(200)
         ]
 
         # Panel de información
@@ -37,6 +41,7 @@ class Simulacion:
 
         self.clock = pygame.time.Clock()
         self.running = True
+        self.iteracion = 0
 
     # Main loop
     def run(self):
@@ -44,7 +49,7 @@ class Simulacion:
             self.handle_events()
             self.update()
             self.render()
-            self.clock.tick(60)  # 60 FPS
+            self.clock.tick(24)
 
         pygame.quit()
 
@@ -76,6 +81,8 @@ class Simulacion:
                 max_vel = self.max_velocity
             )
 
+        self.iteracion += 1
+
 
     # Renderizar assets y objetos
     def render(self):
@@ -91,6 +98,7 @@ class Simulacion:
         # Dibujar información
         self.information.render(self.screen, 
             {
+                "Iteración": self.iteracion,
                 "Cantidad de partículas": len(self.particles),
                 "Mejor posición global": f"({self.gbest[0]:0.2f}, {self.gbest[1]:0.2f})",
                 "Fitness global": self.gbest_fitness,

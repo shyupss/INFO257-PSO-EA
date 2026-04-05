@@ -1,17 +1,20 @@
-//! PSO Rust - Particle Swarm Optimization
+//! EA Rust - Evolutionary Algorithm
 //!
 //! Supports two modes controlled by `VISUAL_MODE`:
-//! - **Visual mode** (`true`): Real-time macroquad visualization of PSO on the Rastrigin function
+//! - **Visual mode** (`true`): Real-time macroquad visualization of EA on the Rastrigin function
 //! - **Console mode** (`false`): Batch execution of multiple runs with statistical analysis
 //!
 //! # Project Structure
 //! ```text
 //! src/
-//! ├── main.rs      (this file) - Entry point, mode switch
-//! ├── surface.rs   - Rastrigin heatmap generation
-//! ├── particle.rs  - PSO particle implementation
-//! ├── swarm.rs     - Swarm management and iteration logic
-//! └── drawing.rs   - UI drawing functions
+//! ├── main.rs        (this file) - Entry point, mode switch
+//! ├── surface.rs     - Rastrigin heatmap generation
+//! ├── drawing.rs     - UI drawing functions
+//! └── ea/
+//!     ├── mod.rs         - Module re-exports
+//!     ├── params.rs      - EA parameter constants
+//!     ├── individual.rs  - Individual (chromosome) implementation
+//!     └── population.rs  - Population management and evolutionary loop
 //! ```
 
 // ============================================================================
@@ -21,8 +24,8 @@
 /// Surface module - Rastrigin heatmap generation
 mod surface;
 
-/// PSO module containing particle and swarm logic
-mod pso;
+/// EA module containing individual and population logic
+mod ea;
 
 /// Drawing module - UI rendering functions
 mod drawing;
@@ -31,13 +34,13 @@ mod drawing;
 // IMPORTS
 // ============================================================================
 
-use drawing::{draw_global_best, draw_info_overlay, draw_particles, should_quit};
+use drawing::{draw_best_individual, draw_individuals, draw_info_overlay, should_quit};
+use ea::params::{DOMAIN_MAX, DOMAIN_MIN};
+use ea::population::{Population, RunResult};
 use macroquad::prelude::*;
-use pso::params::{DOMAIN_MAX, DOMAIN_MIN};
-use pso::swarm::{RunResult, Swarm};
 use surface::RastriginSurface;
 
-/// Seconds between each PSO iteration step.
+/// Seconds between each EA generation step.
 const STEP_INTERVAL: f64 = 0.034;
 
 /// Seconds between FPS counter refreshes.
@@ -57,7 +60,7 @@ const NUM_RUNS: usize = 30;
 // STATISTICS (console mode)
 // ============================================================================
 
-/// Calculate statistics from multiple PSO runs.
+/// Calculate statistics from multiple EA runs.
 /// Returns (min, max, mean, `std_deviation`, `success_count`).
 fn calculate_stats(results: &[RunResult]) -> (f64, f64, f64, f64, usize) {
 	let values: Vec<f64> = results.iter().map(|r| r.best_value).collect();
@@ -70,11 +73,11 @@ fn calculate_stats(results: &[RunResult]) -> (f64, f64, f64, f64, usize) {
 	(min, max, mean, standard_deviation, successes)
 }
 
-/// Run PSO in console batch mode: execute `NUM_RUNS` independent runs,
+/// Run EA in console batch mode: execute `NUM_RUNS` independent runs,
 /// print per-run results, and display aggregate statistics.
 fn run_console_mode() {
 	println!("╔═══════════════════════════════════════════════════════════════╗");
-	println!("║  PSO - Minimización de la Función Rastrigin en 2D            ║");
+	println!("║  EA - Minimización de la Función Rastrigin en 2D             ║");
 	println!("╚═══════════════════════════════════════════════════════════════╝");
 	println!();
 	println!("Función: f(x₁, x₂) = 20 + x₁² - 10·cos(2πx₁) + x₂² - 10·cos(2πx₂)");
@@ -87,20 +90,20 @@ fn run_console_mode() {
 	println!("Ejecutando {NUM_RUNS} corridas independientes...\n");
 	println!(
 		"{:>8} {:>15} {:>15} {:>15} {:>10}",
-		"Corrida", "x₁", "x₂", "f(x₁,x₂)", "Iter"
+		"Corrida", "x₁", "x₂", "f(x₁,x₂)", "Gen"
 	);
 	println!("{}", "-".repeat(67));
 
 	for run in 1..=NUM_RUNS {
-		let mut swarm = Swarm::new();
-		let result = swarm.run();
+		let mut population = Population::new();
+		let result = population.run();
 		println!(
 			"{:>8} {:>15.8} {:>15.8} {:>15.8} {:>10}",
 			run,
 			result.best_position[0],
 			result.best_position[1],
 			result.best_value,
-			result.iterations_to_best
+			result.generations_to_best
 		);
 		results.push(result);
 	}
@@ -130,7 +133,7 @@ fn run_console_mode() {
 /// Window configuration for macroquad (used in both modes).
 fn window_configuration() -> Conf {
 	Conf {
-		window_title: "PSO - Rastrigin Function Visualization (Q/ESC to quit)".to_string(),
+		window_title: "EA - Rastrigin Function Visualization (Q/ESC to quit)".to_string(),
 		window_width: 800,
 		window_height: 800,
 		window_resizable: true,
@@ -144,8 +147,8 @@ async fn main() {
 		// Generate the Rastrigin heatmap (done once at startup)
 		let surface = RastriginSurface::new();
 
-		// Create the particle swarm
-		let mut swarm = Swarm::new();
+		// Create the evolutionary population
+		let mut population = Population::new();
 
 		// Timers for throttled stepping and FPS refresh
 		let mut step_accumulator: f64 = 0.0;
@@ -160,10 +163,10 @@ async fn main() {
 
 			let delta_time = f64::from(get_frame_time());
 
-			// ---- Throttled PSO stepping ----
+			// ---- Throttled EA stepping ----
 			step_accumulator += delta_time;
 			while step_accumulator >= STEP_INTERVAL {
-				swarm.step();
+				population.step();
 				step_accumulator -= STEP_INTERVAL;
 			}
 
@@ -177,9 +180,9 @@ async fn main() {
 			// Clear and draw
 			clear_background(BLACK);
 			surface.draw();
-			draw_particles(&swarm, &surface);
-			draw_global_best(&swarm, &surface);
-			draw_info_overlay(&swarm, cached_fps);
+			draw_individuals(&population, &surface);
+			draw_best_individual(&population, &surface);
+			draw_info_overlay(&population, cached_fps);
 
 			next_frame().await;
 		}

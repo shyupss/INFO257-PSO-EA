@@ -1,8 +1,11 @@
 import pygame
-import math
 import numpy as np
 
 class Rastrigin:
+    '''
+    Genera el mapa de calor de la funcion Rastrigin como un pygame.Surface
+    '''
+    
     def __init__(self, width, height, dominio_min = -3, dominio_max = 7):
         self.width = width
         self.height = height
@@ -16,39 +19,27 @@ class Rastrigin:
 
     @staticmethod
     def evaluate(x, y):
-        return 20 + (x**2 - 10 * math.cos(2 * math.pi * x)) + (y**2 - 10 * math.cos(2 * math.pi * y))
+        return 20 + (x**2 - 10 * np.cos(2 * np.pi * x)) + (y**2 - 10 * np.cos(2 * np.pi * y))
 
     
     def generate(self):
-        valores = []
+        x = np.linspace(self.dominio_min, self.dominio_max, self.width)
+        y = np.linspace(self.dominio_min, self.dominio_max, self.height)
 
-        for py in range(self.height):
-            fila = []
-            for px in range(self.width):
-                x = self.dominio_min + (px / self.width) * self.dominio_size
-                y = self.dominio_min + (py / self.height) * self.dominio_size
+        X, Y = np.meshgrid(x, y)
 
-                f = self.evaluate(x, y)
-                fila.append(f)
-            
-            valores.append(fila)
+        Z = self.evaluate(X, Y)
+        Z = (Z - Z.min()) / (Z.max() - Z.min())
 
-        min_val = min(min(r) for r in valores)
-        max_val = max(max(r) for r in valores)
+        image = np.dstack(self.color_map(Z))
+        self.image = pygame.surfarray.make_surface(image.swapaxes(0, 1))
 
-        for py in range(self.height):
-            for px in range(self.width):
-                f = valores[py][px]
-                t = (f - min_val) / (max_val - min_val)
-                color = self.color_map(t)
-                self.imagen.set_at((px, py), color)
-
-        return self.imagen
+        return self.image
 
 
-    def color_map(self, t):
-        r = int(255 * t)
-        g = int(255 * (1 - abs(t - 0.5) * 2))
-        b = int(255 * (1 - t))
+    def color_map(self, Z):
+        R = (255 * Z).astype(np.uint8)
+        G = (255 * (1 - np.abs(Z - 0.5) * 2)).astype(np.uint8)
+        B = (255 * (1 - Z)).astype(np.uint8)
 
-        return (r, g, b)
+        return (R, G, B)
