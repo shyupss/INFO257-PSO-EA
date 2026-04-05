@@ -15,6 +15,8 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1020, 502)
+        MainWindow.setMinimumSize(QtCore.QSize(1020, 502))
+        MainWindow.setMaximumSize(QtCore.QSize(1020, 502))
         MainWindow.setStyleSheet("QStatusBar {\n"
 "    background: transparent;\n"
 "    font: 75 italic 9pt \"Arial\";\n"
