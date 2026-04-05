@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Maximizador función rastrigin</string>
+   <string>Optimizador función rastrigin</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QStatusBar {

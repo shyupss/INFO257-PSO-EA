@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
-def graficar_convergencia(historiales: list[list[float]], titulo: str, xlabel: str, algorithm: str):
+def graficar_convergencia(historiales: list[list[float]], titulo: str, xlabel: str, algorithm: str, params: dict = None):
     fig, ax = plt.subplots(figsize = (9, 5))
 
     for i, h in enumerate(historiales):
@@ -22,6 +22,19 @@ def graficar_convergencia(historiales: list[list[float]], titulo: str, xlabel: s
     ax.set_ylabel("Fitness")
     ax.legend()
     ax.grid(True, alpha = 0.3)
+
+    if params:
+        texto = "\n".join(f"{k}: {v}" for k, v in params.items())
+        ax.text(
+            1.02, 1,
+            texto,
+            transform = ax.transAxes,
+            fontsize = 9,
+            verticalalignment = "top",
+            bbox = dict(boxstyle = "round", facecolor = "whitesmoke", alpha = 0.8)
+        )
+        fig.subplots_adjust(right = 0.75)
+
 
     save_path = f"graficos/{algorithm}_{datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.png"
 

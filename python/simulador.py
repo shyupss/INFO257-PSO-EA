@@ -158,7 +158,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 )
                 historiales.append(sim.run_headless())
 
-            return graficar_convergencia(historiales, "Convergencia PSO", "Iteración", "PSO")
+            params_display = {
+                "N": params["n"],
+                "C1": params["c1"],
+                "C2": params["c2"],
+                "W": params["w"],
+                "Iteraciones": int(params["max_iter"]),
+                "Cantidad simulaciones": params["iter"],
+            }
+
+            return graficar_convergencia(historiales, "Convergencia PSO", "Iteración", "PSO", params = params_display)
 
         self.indicar_ejecucion("Generando gráficos de convergencia para el algoritmo PSO...")
         self.worker_graph_pso = GraphWorker(simulaciones)
@@ -184,8 +193,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     headless = True
                 )
                 historiales.append(sim.run_headless())
+
+            params_display = {
+                "N": params["n"],
+                "K": params["k"],
+                "Pc": params["pc"],
+                "Pm": params["pm"],
+                "Reinserción": "Generacional" if params["reinsercion"] == 1 else "Steady State",
+                "Generaciones": int(params["max_gen"]),
+                "Cantidad simulaciones": params["iter"],
+            }
             
-            return graficar_convergencia(historiales, "Convergencia Algoritmo Genético", "Generación", "EA")
+            return graficar_convergencia(historiales, "Convergencia Algoritmo Genético", "Generación", "EA", params = params_display)
 
         self.indicar_ejecucion("Generando gráficos de convergencia del algoritmo genético...")
         self.worker_graph_ea = GraphWorker(simulaciones)
