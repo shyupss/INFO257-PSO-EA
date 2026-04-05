@@ -256,7 +256,7 @@ class Simulacion:
             }
         )
 
-        self.screen.blit(self.tutorial, (10, self.height - self.tutorial.height))
+        self.screen.blit(self.tutorial, (10, self.height - self.tutorial.get_height()))
 
         pygame.display.flip()
 
