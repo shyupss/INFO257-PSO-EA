@@ -17,7 +17,7 @@ class Simulacion:
         self.N = 50                                 # Tamaño de población
         self.K = 3                                  # Tamaño del torneo
         self.Pc = 0.8                               # Probabilidad de cruzamiento
-        self.Pm = 1 / LONGITUD_CROMOSOMA            # Probabilidad de mutación
+        self.Pm = 0.03                              # Probabilidad de mutación
         self.modo_reinsercion = 1                   # 1 = generacional, 2 = steady state
 
         self.width = 900

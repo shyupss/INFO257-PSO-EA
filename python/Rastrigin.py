@@ -34,6 +34,8 @@ class Rastrigin:
         image = np.dstack(self.color_map(Z))
         self.image = pygame.surfarray.make_surface(image.swapaxes(0, 1))
 
+        #pygame.image.save(self.image, "assets/rastrigin_heatmap.png")
+
         return self.image
 
 
