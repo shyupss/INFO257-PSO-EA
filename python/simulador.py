@@ -109,6 +109,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def ejecutar_pso(self):
         self.lock_buttons()
         params = self.leer_params_pso()
+        self.indicar_ejecucion("Ejecutando simulación gráfica del algoritmo PSO...")
 
         sim = SimulacionPSO(
             max_iter = params["max_iter"],
@@ -125,6 +126,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def ejecutar_ea(self):
         self.lock_buttons()
         params = self.leer_params_ea()
+        self.indicar_ejecucion("Ejecutando simulación gráfica del algoritmo genético...")
 
         sim = SimulacionEA(
             max_gen = params["max_gen"],
@@ -158,6 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             return graficar_convergencia(historiales, "Convergencia PSO", "Iteración", "PSO")
 
+        self.indicar_ejecucion("Generando gráficos de convergencia para el algoritmo PSO...")
         self.worker_graph_pso = GraphWorker(simulaciones)
         self.worker_graph_pso.terminado.connect(self.on_grafico_listo)
         self.lock_buttons()
@@ -184,16 +187,23 @@ class MainWindow(QtWidgets.QMainWindow):
             
             return graficar_convergencia(historiales, "Convergencia Algoritmo Genético", "Generación", "EA")
 
+        self.indicar_ejecucion("Generando gráficos de convergencia del algoritmo genético...")
         self.worker_graph_ea = GraphWorker(simulaciones)
         self.worker_graph_ea.terminado.connect(self.on_grafico_listo)
         self.lock_buttons()
         self.worker_graph_ea.start()
 
 
+    def indicar_ejecucion(self, mensaje):
+        self.ui.statusBar.setStyleSheet('QStatusBar {background: transparent; font: 75 italic 9pt "Arial"; color: #a500f8;}')
+        self.ui.statusBar.showMessage(mensaje, 5000)
+
+
     def on_grafico_listo(self, save_path: str):
         self.lock_buttons(lock = False)
 
         mensaje = f"Gráfico de convergencia generado con éxito en [ {save_path} ]"
+        self.ui.statusBar.setStyleSheet('QStatusBar {background: transparent; font: 75 italic 9pt "Arial"; color: rgb(98, 195, 0);}')
         self.ui.statusBar.showMessage(mensaje, 5000)
 
 
