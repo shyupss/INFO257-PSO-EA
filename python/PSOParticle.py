@@ -12,7 +12,7 @@ class Particle:
         self.color = color
         self.radius = radius
 
-        self.image = pygame.image.load("assets/particle.png").convert_alpha()
+        #self.image = pygame.image.load("assets/particle.png").convert_alpha()
         w, h = screen.get_size()
         self.width = w
         self.height = h

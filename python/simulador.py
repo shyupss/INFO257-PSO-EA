@@ -1,10 +1,24 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtCore import QThread, pyqtSignal
 import sys
 
+from graficos import graficar_convergencia
 from interfaz_simulador import Ui_MainWindow
 from pso import Simulacion as SimulacionPSO
 from ea import Simulacion as SimulacionEA
+
+
+class GraphWorker(QThread):
+    terminado = pyqtSignal(str)
+
+    def __init__(self, fn):
+        super().__init__()
+        self.fn = fn
+
+    def run(self):
+        save_path = self.fn()
+        self.terminado.emit(save_path or "")
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -12,6 +26,10 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.ui.graph_pso.setEnabled(False)
+        self.ui.graph_ea.setEnabled(False)
+
         self.conectar_señales()
 
         self.ui.ea_n.setValidator(QIntValidator(1,99999999))
@@ -30,14 +48,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.iter_pso.setValidator(QIntValidator(1,99999999))
         
 
-
     def conectar_señales(self):
         self.ui.exec_pso.clicked.connect(self.ejecutar_pso)
         self.ui.graph_pso.clicked.connect(self.graficar_pso)
         self.ui.exec_ea.clicked.connect(self.ejecutar_ea)
         self.ui.graph_ea.clicked.connect(self.graficar_ea)
+        self.ui.max_gen_pso.textChanged.connect(self.validar_condicion_termino_pso)
+        self.ui.max_gen_ea.textChanged.connect(self.validar_condicion_termino_ea)
 
 
+    def validar_condicion_termino_pso(self):
+        tiene_texto = bool(self.ui.max_gen_pso.text().strip())
+        self.ui.graph_pso.setEnabled(tiene_texto)
+
+        
+    def validar_condicion_termino_ea(self):
+        tiene_texto = bool(self.ui.max_gen_ea.text().strip())
+        self.ui.graph_ea.setEnabled(tiene_texto)
+
+    
     def leer_params_pso(self):
         def val(widget, default):
             texto = widget.text().strip()
@@ -72,9 +101,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def lock_buttons(self, lock = True):
         self.ui.exec_pso.setDisabled(lock)
-        self.ui.graph_pso.setDisabled(lock)
         self.ui.exec_ea.setDisabled(lock)
-        self.ui.graph_ea.setDisabled(lock)
+        if self.ui.max_gen_pso.text(): self.ui.graph_pso.setDisabled(lock)
+        if self.ui.max_gen_ea.text(): self.ui.graph_ea.setDisabled(lock)
 
 
     def ejecutar_pso(self):
@@ -91,10 +120,6 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         sim.run()
         self.lock_buttons(lock = False)
-
-
-    def graficar_pso(self):
-        params = self.leer_params_pso()
 
     
     def ejecutar_ea(self):
@@ -113,8 +138,63 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lock_buttons(lock = False)
 
 
+    def graficar_pso(self):
+        params = self.leer_params_pso()
+
+        def simulaciones():
+            historiales = []
+
+            for _ in range(params["iter"]):
+                sim = SimulacionPSO(
+                    max_iter = params["max_iter"],
+                    n = params["n"],
+                    c1 = params["c1"],
+                    c2 = params["c2"],
+                    w = params["w"],
+                    vel = params["vel"],
+                    headless = True
+                )
+                historiales.append(sim.run_headless())
+
+            return graficar_convergencia(historiales, "Convergencia PSO", "Iteración", "PSO")
+
+        self.worker_graph_pso = GraphWorker(simulaciones)
+        self.worker_graph_pso.terminado.connect(self.on_grafico_listo)
+        self.lock_buttons()
+        self.worker_graph_pso.start()
+
+
     def graficar_ea(self):
         params = self.leer_params_ea()
+
+        def simulaciones():
+            historiales = []
+
+            for _ in range(params["iter"]):
+                sim = SimulacionEA(
+                    max_gen = params["max_gen"],
+                    n = params["n"],
+                    k = params["k"],
+                    pc = params["pc"],
+                    pm = params["pm"],
+                    reinsercion = params["reinsercion"],
+                    headless = True
+                )
+                historiales.append(sim.run_headless())
+            
+            return graficar_convergencia(historiales, "Convergencia Algoritmo Genético", "Generación", "EA")
+
+        self.worker_graph_ea = GraphWorker(simulaciones)
+        self.worker_graph_ea.terminado.connect(self.on_grafico_listo)
+        self.lock_buttons()
+        self.worker_graph_ea.start()
+
+
+    def on_grafico_listo(self, save_path: str):
+        self.lock_buttons(lock = False)
+
+        mensaje = f"Gráfico de convergencia generado con éxito en [ {save_path} ]"
+        self.ui.statusBar.showMessage(mensaje, 5000)
 
 
 if __name__ == "__main__":

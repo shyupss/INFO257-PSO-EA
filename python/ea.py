@@ -16,7 +16,8 @@ class Simulacion:
         k: int = 3, 
         pc: float = 0.8, 
         pm: float = 0.03, 
-        reinsercion: int = 1
+        reinsercion: int = 1,
+        headless: bool = False
     ):
         pygame.init()
 
@@ -30,12 +31,16 @@ class Simulacion:
         self.width = 900
         self.height = 900
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Algoritmo Genético")
+        # Inicialización con o sin motor gráfico
+        if headless:
+            self.screen = pygame.Surface((self.width, self.height))
+        else:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.set_caption("Algoritmo Genético")
+            self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         rastrigin_map = Rastrigin(self.width, self.height)
         self.bg = rastrigin_map.generate()
-        self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         self.max_gen = max_gen
 
@@ -75,6 +80,24 @@ class Simulacion:
             self.clock.tick(20)
 
         pygame.quit()
+
+    
+    def run_headless(self):
+        """Corre la simulación sin pygame, retorna historial de fitness por generación."""
+        historial = []
+
+        max_gen = int(self.max_gen) if self.max_gen is not None else 200
+
+        for _ in range(max_gen):
+            if self.modo_reinsercion == 1:
+                self._generacional()
+            else:
+                self._steady_state()
+
+            self.generacion += 1
+            historial.append(self.gbest_fitness)
+
+        return historial
 
 
     # Procesar los eventos del usuario

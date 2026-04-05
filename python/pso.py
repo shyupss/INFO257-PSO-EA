@@ -15,19 +15,24 @@ class Simulacion:
         c1: float = 3.0, 
         c2: float = 10.0, 
         w: float = 100.0, 
-        vel: float = 4.0
+        vel: float = 4.0,
+        headless: bool = False
     ):
         pygame.init()
 
         self.width = 900
         self.height = 900
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("PSO")
-        #self.bg = pygame.image.load("assets/circulos.png").convert()
+        # Inicialización con o sin motor gráfico
+        if headless:
+            self.screen = pygame.Surface((self.width, self.height))
+        else:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.set_caption("PSO")
+            self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
+
         rastrigin_map = Rastrigin(self.width, self.height)
         self.bg = rastrigin_map.generate()
-        self.gbest_img = pygame.image.load("assets/global_best.png").convert_alpha()
 
         self.max_iter = max_iter
 
@@ -69,6 +74,32 @@ class Simulacion:
             self.clock.tick(20)
 
         pygame.quit()
+
+    
+    def run_headless(self):
+        """Corre la simulación sin pygame, retorna historial de fitness por iteración."""
+        historial = []
+
+        max_iter = int(self.max_iter) if self.max_iter is not None else 200
+
+        for _ in range(max_iter):
+            for particle in self.particles:
+                fitness = particle.evaluate()
+                if fitness > self.gbest_fitness:
+                    self.gbest_fitness = fitness
+                    self.gbest = (particle.x, particle.y)
+
+            for particle in self.particles:
+                particle.move(self.screen, self.gbest,
+                    c1 = self.learning_c1,
+                    c2 = self.learning_c2,
+                    w = self.inercia,
+                    max_vel = self.max_velocity
+                )
+
+            historial.append(self.gbest_fitness)
+
+        return historial
 
 
     # Procesar los eventos del usuario

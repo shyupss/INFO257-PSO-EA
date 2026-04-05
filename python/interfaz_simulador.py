@@ -14,7 +14,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1020, 492)
+        MainWindow.resize(1020, 502)
+        MainWindow.setStyleSheet("QStatusBar {\n"
+"    background: transparent;\n"
+"    font: 75 italic 9pt \"Arial\";\n"
+"    color: rgb(98, 195, 0);\n"
+"}")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.frame = QtWidgets.QFrame(self.centralwidget)
@@ -338,9 +343,8 @@ class Ui_MainWindow(object):
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame_3)
-        self.verticalLayout.setObjectName("verticalLayout")
         self.label_4 = QtWidgets.QLabel(self.frame_3)
+        self.label_4.setGeometry(QtCore.QRect(10, 10, 300, 31))
         self.label_4.setMaximumSize(QtCore.QSize(300, 100))
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -351,17 +355,17 @@ class Ui_MainWindow(object):
 "}")
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setObjectName("label_4")
-        self.verticalLayout.addWidget(self.label_4)
         self.label_3 = QtWidgets.QLabel(self.frame_3)
+        self.label_3.setGeometry(QtCore.QRect(10, 50, 300, 300))
         self.label_3.setMinimumSize(QtCore.QSize(300, 300))
         self.label_3.setMaximumSize(QtCore.QSize(300, 300))
         self.label_3.setText("")
         self.label_3.setPixmap(QtGui.QPixmap("python/ui\\../../assets/rastrigin_heatmap.png"))
         self.label_3.setScaledContents(True)
         self.label_3.setObjectName("label_3")
-        self.verticalLayout.addWidget(self.label_3)
         self.textBrowser = QtWidgets.QTextBrowser(self.frame_3)
-        self.textBrowser.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.textBrowser.setGeometry(QtCore.QRect(10, 350, 300, 61))
+        self.textBrowser.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -371,18 +375,8 @@ class Ui_MainWindow(object):
 "    background: transparent;\n"
 "}")
         self.textBrowser.setObjectName("textBrowser")
-        self.verticalLayout.addWidget(self.textBrowser)
-        self.frame_4 = QtWidgets.QFrame(self.frame_3)
-        self.frame_4.setMaximumSize(QtCore.QSize(16777215, 50))
-        self.frame_4.setStyleSheet("QFrame {\n"
-"    border: none;\n"
-"}")
-        self.frame_4.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_4.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_4.setObjectName("frame_4")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame_4)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.label_5 = QtWidgets.QLabel(self.frame_4)
+        self.label_5 = QtWidgets.QLabel(self.frame_3)
+        self.label_5.setGeometry(QtCore.QRect(60, 410, 200, 40))
         self.label_5.setMinimumSize(QtCore.QSize(0, 40))
         self.label_5.setMaximumSize(QtCore.QSize(200, 40))
         self.label_5.setStyleSheet("QLabel {\n"
@@ -392,9 +386,10 @@ class Ui_MainWindow(object):
         self.label_5.setPixmap(QtGui.QPixmap("python/ui\\../../assets/rastrigin_function.png"))
         self.label_5.setScaledContents(True)
         self.label_5.setObjectName("label_5")
-        self.horizontalLayout.addWidget(self.label_5)
-        self.verticalLayout.addWidget(self.frame_4)
         MainWindow.setCentralWidget(self.centralwidget)
+        self.statusBar = QtWidgets.QStatusBar(MainWindow)
+        self.statusBar.setObjectName("statusBar")
+        MainWindow.setStatusBar(self.statusBar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -417,11 +412,11 @@ class Ui_MainWindow(object):
         self.graph_pso.setText(_translate("MainWindow", "Ejecutar para extraer gráficos"))
         self.label_16.setText(_translate("MainWindow", "Parámetros"))
         self.label_17.setText(_translate("MainWindow", "Configuración de la simulación"))
-        self.max_gen_pso.setPlaceholderText(_translate("MainWindow", "Default: 200"))
+        self.max_gen_pso.setPlaceholderText(_translate("MainWindow", "Default: None"))
         self.label_22.setText(_translate("MainWindow", "Generación máxima"))
         self.iter_pso.setPlaceholderText(_translate("MainWindow", "Default: 1"))
         self.label_23.setText(_translate("MainWindow", "Cantidad de iteraciones"))
-        self.label_2.setText(_translate("MainWindow", "Algoritmo Evolutivo"))
+        self.label_2.setText(_translate("MainWindow", "Algoritmo Genético"))
         self.input_k.setPlaceholderText(_translate("MainWindow", "Default: 3"))
         self.input_pc.setPlaceholderText(_translate("MainWindow", "Default: 0.8"))
         self.label_12.setText(_translate("MainWindow", "Probabilidad de cruzamiento"))
@@ -437,7 +432,7 @@ class Ui_MainWindow(object):
         self.label_21.setText(_translate("MainWindow", "Parámetros"))
         self.exec_ea.setText(_translate("MainWindow", "Ejecutar simulación"))
         self.graph_ea.setText(_translate("MainWindow", "Ejecutar para extraer gráficos"))
-        self.max_gen_ea.setPlaceholderText(_translate("MainWindow", "Default: 200"))
+        self.max_gen_ea.setPlaceholderText(_translate("MainWindow", "Default: None"))
         self.label_24.setText(_translate("MainWindow", "Generación máxima"))
         self.label_25.setText(_translate("MainWindow", "Cantidad de iteraciones"))
         self.iter_ea.setPlaceholderText(_translate("MainWindow", "Default: 1"))
@@ -446,7 +441,7 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Función a optimizar utilizando los algoritmos PSO y EA en un dominio continuo -3 &lt; x</span><span style=\" font-family:\'MS Shell Dlg 2\'; vertical-align:sub;\">i</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> &lt; 7</span></p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Función a optimizar utilizando los algoritmos PSO y EA en un dominio continuo de dos dimensiones de -3 &lt; x</span><span style=\" font-family:\'MS Shell Dlg 2\'; vertical-align:sub;\">i</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> &lt; 7</span></p></body></html>"))
 
 
 if __name__ == "__main__":
