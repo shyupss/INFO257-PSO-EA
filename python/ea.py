@@ -12,9 +12,9 @@ class Simulacion:
 
     def __init__(self,
         max_gen: int = None,
-        n: int = 200, 
+        n: int = 100, 
         k: int = 3, 
-        pc: float = 0.8, 
+        pc: float = 0.85, 
         pm: float = 0.03, 
         reinsercion: int = 1,
         headless: bool = False
@@ -66,6 +66,7 @@ class Simulacion:
         self.reproduciendo = False
         self.stop = False
         self.generacion = 0
+        self.best_generacion = 0
 
 
     # Main loop
@@ -97,7 +98,7 @@ class Simulacion:
             self.generacion += 1
             historial.append(self.gbest_fitness)
 
-        return historial
+        return historial, self.best_generacion
 
 
     # Procesar los eventos del usuario
@@ -177,6 +178,7 @@ class Simulacion:
                 self.gbest_fitness = p.fitness
                 self.gbest_cromosoma = p.cromosoma[:]
                 self.gbest = p.decode()
+                self.best_generacion = self.generacion
 
 
     def _generacional(self):
@@ -276,6 +278,7 @@ class Simulacion:
                 "Probabilidad de mutación (Pm)": f"{self.Pm:.4f}",
                 "Mejor posición": f"({gx_dom:.3f}, {gy_dom:.3f})",
                 "Mejor fitness": f"{self.gbest_fitness:.4f}",
+                "Mejor generación": self.best_generacion
             }
         )
 

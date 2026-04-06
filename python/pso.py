@@ -11,11 +11,11 @@ class Simulacion:
     
     def __init__(self,
         max_iter: int = None,
-        n: int = 200, 
+        n: int = 100, 
         c1: float = 3.0, 
-        c2: float = 10.0, 
-        w: float = 100.0, 
-        vel: float = 4.0,
+        c2: float = 5.0, 
+        w: float = 50.0, 
+        vel: float = 10.0,
         headless: bool = False
     ):
         pygame.init()
@@ -64,6 +64,7 @@ class Simulacion:
         self.reproduciendo = False
         self.stop = False
         self.iteracion = 0
+        self.best_iteracion = 0
 
     # Main loop
     def run(self):
@@ -88,6 +89,7 @@ class Simulacion:
                 if fitness > self.gbest_fitness:
                     self.gbest_fitness = fitness
                     self.gbest = (particle.x, particle.y)
+                    self.best_iteracion = self.iteracion
 
             for particle in self.particles:
                 particle.move(self.screen, self.gbest,
@@ -97,9 +99,10 @@ class Simulacion:
                     max_vel = self.max_velocity
                 )
 
+            self.iteracion += 1
             historial.append(self.gbest_fitness)
 
-        return historial
+        return historial, self.best_iteracion
 
 
     # Procesar los eventos del usuario
@@ -125,6 +128,7 @@ class Simulacion:
             if fitness > self.gbest_fitness:
                 self.gbest_fitness = fitness
                 self.gbest = (particle.x, particle.y)
+                self.best_iteracion = self.iteracion
 
         # Mover las partículas
         for particle in self.particles:
@@ -165,7 +169,8 @@ class Simulacion:
                 "Learning factor C1": self.learning_c1,
                 "Learning factor C2": self.learning_c2,
                 "Inercia W": self.inercia,
-                "Velocidad máxima": self.max_velocity
+                "Velocidad máxima": self.max_velocity,
+                "Mejor iteración": self.best_iteracion
             }
         )
 

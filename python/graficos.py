@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
-def graficar_convergencia(historiales: list[list[float]], titulo: str, xlabel: str, algorithm: str, params: dict = None):
+def graficar_convergencia(historiales_raw, titulo: str, xlabel: str, algorithm: str, params: dict = None):
+    historiales = [h for h, _ in historiales_raw]
+    best_steps = [b for _, b in historiales_raw]
+
     fig, ax = plt.subplots(figsize = (9, 5))
 
     for i, h in enumerate(historiales):
@@ -24,6 +27,10 @@ def graficar_convergencia(historiales: list[list[float]], titulo: str, xlabel: s
     ax.grid(True, alpha = 0.3)
 
     if params:
+        promedio_best = sum(best_steps) / len(best_steps)
+        label_best = "Mejor iteración (prom.)" if xlabel == "Iteración" else "Mejor generación (prom.)"
+        params[label_best] = f"{promedio_best:.1f}"
+        
         texto = "\n".join(f"{k}: {v}" for k, v in params.items())
         ax.text(
             1.02, 1,

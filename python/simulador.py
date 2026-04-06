@@ -74,12 +74,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         return {
             "max_iter": val(self.ui.max_gen_pso, None),
-            "iter": int(val(self.ui.iter_pso, 1)),
-            "n": int(val(self.ui.pso_n, 50)),
+            "iter": int(val(self.ui.iter_pso, 30)),
+            "n": int(val(self.ui.pso_n, 100)),
             "c1": val(self.ui.input_c1, 3.0),
-            "c2": val(self.ui.input_c2, 10.0),
-            "w": val(self.ui.input_w, 100.0),
-            "vel": val(self.ui.input_vel, 4.0),
+            "c2": val(self.ui.input_c2, 5.0),
+            "w": val(self.ui.input_w, 50.0),
+            "vel": val(self.ui.input_vel, 10.0),
         }
 
 
@@ -90,10 +90,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
         return {
             "max_gen": val(self.ui.max_gen_ea, None),
-            "iter": int(val(self.ui.iter_ea, 1)),
-            "n": int(val(self.ui.ea_n, 50)),
+            "iter": int(val(self.ui.iter_ea, 30)),
+            "n": int(val(self.ui.ea_n, 100)),
             "k": int(val(self.ui.input_k, 3)),
-            "pc": val(self.ui.input_pc, 0.8),
+            "pc": val(self.ui.input_pc, 0.85),
             "pm": val(self.ui.input_pm, 0.03),
             "reinsercion": 1 if self.ui.input_reinsercion.currentText() == "Generacional" else 2
         }
@@ -159,12 +159,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 historiales.append(sim.run_headless())
 
             params_display = {
-                "N": params["n"],
-                "C1": params["c1"],
-                "C2": params["c2"],
-                "W": params["w"],
+                "Tamaño de la población": params["n"],
+                "Aprendizaje individual C1": params["c1"],
+                "Aprendizaje grupal C2": params["c2"],
+                "Inercia": params["w"],
+                "Velocidad máxima": params["vel"],
                 "Iteraciones": int(params["max_iter"]),
-                "Cantidad simulaciones": params["iter"],
+                "Cantidad de simulaciones": params["iter"],
             }
 
             return graficar_convergencia(historiales, "Convergencia PSO", "Iteración", "PSO", params = params_display)
@@ -195,13 +196,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 historiales.append(sim.run_headless())
 
             params_display = {
-                "N": params["n"],
-                "K": params["k"],
-                "Pc": params["pc"],
-                "Pm": params["pm"],
+                "Tamaño de la población": params["n"],
+                "Tamaño del torneo": params["k"],
+                "Probabilidad de cruzamiento": params["pc"],
+                "Probabilidad de mutación": params["pm"],
                 "Reinserción": "Generacional" if params["reinsercion"] == 1 else "Steady State",
                 "Generaciones": int(params["max_gen"]),
-                "Cantidad simulaciones": params["iter"],
+                "Cantidad de simulaciones": params["iter"],
             }
             
             return graficar_convergencia(historiales, "Convergencia Algoritmo Genético", "Generación", "EA", params = params_display)

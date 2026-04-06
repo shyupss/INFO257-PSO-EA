@@ -90,7 +90,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 50</string>
+      <string>Default: 100</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_c1">
@@ -116,7 +116,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 10.0</string>
+      <string>Default: 5.0</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_w">
@@ -129,7 +129,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 100.0</string>
+      <string>Default: 50.0</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="input_vel">
@@ -142,7 +142,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 4.0</string>
+      <string>Default: 10.0</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_6">
@@ -424,7 +424,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 1</string>
+      <string>Default: 30</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_23">
@@ -525,7 +525,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 0.8</string>
+      <string>Default: 0.85</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
@@ -632,7 +632,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 50</string>
+      <string>Default: 100</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
@@ -883,7 +883,7 @@
       </rect>
      </property>
      <property name="placeholderText">
-      <string>Default: 1</string>
+      <string>Default: 30</string>
      </property>
     </widget>
    </widget>
