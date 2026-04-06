@@ -6,4 +6,4 @@ venv
 .venv
 **/.venv
 __pycache__
-
+**/.python-version
